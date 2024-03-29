@@ -1,0 +1,60 @@
+/*Hotel List page*/
+.hotel-list-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.hotel-list-page h4{
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 40px;
+}
+
+/*hotel card*/
+/*hotel image*/
+.hotel-list-page .hotel-card{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0 1px 2px 0, rgba(60, 64, 67, 0.15) 0 2px 6px 2px;
+    padding: 30px;
+    margin: 30px auto;
+}
+.hotel-list-page .hotel-card .hotel-card-image{
+    width: 33%;
+}
+.hotel-list-page .hotel-card .hotel-card-image img{
+    width: 100%;
+    height: 300px;
+}
+/*card content*/
+.hotel-list-page .hotel-card .hotel-card-content{
+    width: 60%;
+}
+.hotel-card-content h4{
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    margin: 20px auto;
+    font-size: 20px;
+}
+.hotel-card-content p{
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    margin: 20px auto;
+    font-size: 14px;
+}
+.hotel-card-content h2{
+    margin: 20px auto;
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+}
+.hotel-list-page .show-more-button{
+    width: 80%;
+    margin: 60px auto;
+}
+

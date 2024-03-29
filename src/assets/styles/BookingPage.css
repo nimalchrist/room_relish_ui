@@ -1,0 +1,70 @@
+/*booking page*/
+.booking-container{
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    margin: 100px auto;
+}
+
+/*overview container*/
+.booking-container .booking-overview{
+    height: auto;
+    width: 47%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.booking-container .booking-overview h1{
+    width: 47%;
+    font-family: "Montserrat", sans-serif;
+    font-size: 26px;
+    margin: 45px 0;
+}
+.booking-container .booking-overview #price{
+    color: #3d68f3;
+    text-align: right;
+}
+.booking-container .booking-overview div{
+    width: 80%;
+    margin: 20px auto;
+    padding: 35px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-family: "Montserrat", sans-serif;
+    text-align: center;
+}
+.booking-container .booking-overview .payment-button{
+    width: 90%;
+    margin: 20px auto;
+}
+.booking-container .booking-overview div h4{
+    margin: 40px auto;
+    font-weight: 500;
+}
+
+/*payment container*/
+.booking-container .payment-details{
+    width: 47%;
+    justify-content: space-between;
+    padding: 25px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.booking-container .payment-details img{
+    width: 38%;
+    height: 160px;
+}
+.booking-container .payment-details h3{
+    padding: 15px 0;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+}
+.booking-container .payment-details h2{
+    font-family: "Montserrat", sans-serif;
+    height: 40px;
+    margin: 10px auto;
+    font-size: 24px;
+}
+.booking-container .payment-details .line{
+    width: 100%;
+    height: 1px;
+    background-color: black;
+}
