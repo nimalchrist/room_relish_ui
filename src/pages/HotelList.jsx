@@ -52,6 +52,7 @@ function HotelList() {
                             hotelName={hotel.hotelName}
                             hotelAddress={hotel.location.address}
                             hotelRating={hotel.rating}
+                            totalReviews={hotel.numReviews}
                             basePrice={hotel.ratePerNight}
                             hotelImage={hotel.images[0]}
                             hotelId={hotel._id}

@@ -1,7 +1,8 @@
 import StyledButton from "../customised/StyledButton";
 import {useNavigate} from "react-router-dom";
+import {Rating} from "@mui/material";
 
-function HotelCard({hotelName, hotelImage, hotelAddress, hotelRating, basePrice, hotelId,checkIn,checkOut,rooms}) {
+function HotelCard({hotelName, hotelImage, hotelAddress, hotelRating,totalReviews, basePrice, hotelId,checkIn,checkOut,rooms}) {
     const navigate = useNavigate();
     const handleButtonClick = () => {
         const queryString = `?checkIn=${encodeURIComponent(
@@ -21,7 +22,7 @@ function HotelCard({hotelName, hotelImage, hotelAddress, hotelRating, basePrice,
                 <div className="hotel-card-content">
                     <h2>{hotelName}</h2>
                     <h4>{hotelAddress}</h4>
-                    <p>Hotel Rating: {Math.round(hotelRating)}</p>
+                    <span><Rating value={hotelRating} readOnly/>({totalReviews})</span>
                     <p>Starting from <i>Rs. {basePrice}</i></p>
                     <StyledButton onClick={handleButtonClick}>View Hotel</StyledButton>
                 </div>

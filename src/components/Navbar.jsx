@@ -1,15 +1,23 @@
 import {Button} from "@mui/material";
 import Image from "../assets/images/header-images/logo.png";
 import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+
 const Navbar = () => {
     const navigate = useNavigate();
-    function handleSignUp() {
+    const [loginStatus, setLoginStatus] = useState(false);
+
+    const handleSignUp = () => {
+        setLoginStatus(true);
         navigate('/signup');
     }
-    function handleLogin() {
+
+    const handleLogin = () => {
+        setLoginStatus(true);
         navigate('/login');
     }
-    function handleHomeClick() {
+
+    const handleHomeClick = () => {
         navigate('/');
     }
     return (
@@ -20,10 +28,18 @@ const Navbar = () => {
             <div className="nav-logo" onClick={handleHomeClick} style={{cursor: "pointer"}}>
                 <img src={Image} alt={Image} width={70} height={50}/>
             </div>
-            <div>
-                <Button className="navbar-button" id="signup-btn" onClick={handleSignUp}>Sign up</Button>
-                <Button className="navbar-button" id="login-btn" onClick={handleLogin}>Login</Button>
-            </div>
+            {
+                !loginStatus
+                    ?
+                        <div>
+                            <Button className="navbar-button" id="signup-btn" onClick={handleSignUp}>Sign up</Button>
+                            <Button className="navbar-button" id="login-btn" onClick={handleLogin}>Login</Button>
+                        </div>
+                    :
+                    <div>
+
+                    </div>
+            }
         </div>
     );
 }

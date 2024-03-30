@@ -1,4 +1,4 @@
-import {NavLink} from "react-router-dom";
+import {Link} from "react-router-dom";
 import Logo from "../assets/images/header-images/logo.png";
 import instagram from '../assets/icons/footer-icons/instagram.svg';
 import facebook from '../assets/icons/footer-icons/facebook.svg';
@@ -9,10 +9,10 @@ function Footer()
         <div className="footer-section">
             <div className="locations">
                 <h3>Top Locations</h3>
-                <NavLink to='/hotel-list'>Chennai</NavLink><br/>
-                <NavLink to='/hotel-list'>Bangalore</NavLink><br/>
-                <NavLink to='/hotel-list'>Madurai</NavLink><br/>
-                <NavLink to='/hotel-list'>Coimbatore</NavLink><br/>
+                <Link style={{margin: "10px auto"}} to='/hotel-list?q=chennai&checkIn=2024-04-05&checkOut=2024-04-06&rooms=1'>Chennai</Link><br/>
+                <Link style={{margin: "10px auto"}} to='/hotel-list?q=bangalore&checkIn=2024-04-05&checkOut=2024-04-06&rooms=1'>Bangalore</Link><br/>
+                <Link style={{margin: "10px auto"}} to='/hotel-list?q=madurai&checkIn=2024-04-05&checkOut=2024-04-06&rooms=1'>Madurai</Link><br/>
+                <Link style={{margin: "10px auto"}} to='/hotel-list?q=coimbatore&checkIn=2024-04-05&checkOut=2024-04-06&rooms=1'>Coimbatore</Link><br/>
             </div>
             <div className="follow">
                 <h3>Follow Us</h3>

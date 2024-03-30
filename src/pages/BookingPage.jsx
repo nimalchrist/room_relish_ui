@@ -6,12 +6,37 @@ import StyledButton from "../components/customised/StyledButton";
 
 function BookingPage() {
     const queryParameter = new URLSearchParams(window.location.search);
-    const {hotelId} = useParams();
     const roomId = queryParameter.get('q');
+
+    // hooks
     const [hotelData, setHotelData] = useState(null);
     const [roomData, setRoomData] = useState(null);
     const navigate = useNavigate();
+    useEffect(() => {
+        fetchHotelData()
+    }, []);
+    const {hotelId} = useParams();
 
+    // supportive methods
+    const numberOfDays = (checkIn, checkOut) => {
+        const checkInDate = new Date(checkIn);
+        const checkOutDate = new Date(checkOut);
+
+        const timeDifference = checkOutDate.getTime() - checkInDate.getTime();
+
+        return Math.max(Math.ceil(timeDifference / (1000 * 3600 * 24)), 1);
+    }
+    const computeTotal = () => {
+        if (!roomData || !queryParameter.get('checkIn') || !queryParameter.get('checkOut') || !queryParameter.get('rooms')) {
+            return 0;
+        }
+
+        const baseFare = roomData.roomRate;
+        const numberOfRooms = parseInt(queryParameter.get('rooms'), 10);
+        const days = numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'));
+
+       return baseFare * numberOfRooms * days;
+    };
     const fetchHotelData = async () => {
         try {
             const url = `http://localhost:3200/hotels/${hotelId}`;
@@ -28,14 +53,16 @@ function BookingPage() {
         }
     }
 
-    useEffect(() => {
-        fetchHotelData()
-    }, []);
-
     function handlePaymentButtonClick() {
-        navigate(`/hotel-list/${hotelId}/booking/${roomId}`);
+        const queryString = `?days=${encodeURIComponent(
+            numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'))
+        )}&rooms=${encodeURIComponent(
+            queryParameter.get('rooms')
+        )}`;
+        navigate(`/hotel-list/${hotelId}/booking/${roomId}${queryString}`);
     }
 
+    // jsx layout
     return (
         <>
             <div className="booking-container">
@@ -52,8 +79,9 @@ function BookingPage() {
                                                                                           alt='booking'/>
                                         <span>{queryParameter.get('checkOut')}</span></h4>
                                 </div>
-                                <StyledButton className='payment-button' onClick={handlePaymentButtonClick}>Proceed with
-                                    Payment</StyledButton>
+                                <StyledButton className='payment-button' onClick={handlePaymentButtonClick}>
+                                    Confirm Booking
+                                </StyledButton>
 
                             </div>
                             <div className="payment-details">
@@ -63,7 +91,42 @@ function BookingPage() {
                                 <h3>Your booking is protected by <i style={{fontWeight: "bold"}}>Room Relish</i></h3>
                                 <div className='line'></div>
                                 <div>
-                                    <h3>Price details</h3>
+                                    <h3 style={{fontWeight: "bold"}}>Price details</h3>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td>Base Fare</td>
+                                            <td className='second'>Rs. {roomData.roomRate}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Number of days</td>
+                                            <td className='second'>{numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rooms count</td>
+                                            <td className='second'>{queryParameter.get('rooms')}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>GST charges</td>
+                                            <td className='second'>Rs. 50</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Transaction charges</td>
+                                            <td className='second'>Rs. 20</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className='line'></div>
+                                <div>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td>Total</td>
+                                            <td className='result'>Rs. {computeTotal()}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </>

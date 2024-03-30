@@ -6,6 +6,8 @@ import HotelList from "./pages/HotelList";
 import HotelDetail from "./pages/HotelDetail";
 import BookingPage from "./pages/BookingPage";
 import PaymentsPage from "./pages/PaymentsPage";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 const router = createBrowserRouter([
     {
@@ -35,11 +37,11 @@ const router = createBrowserRouter([
             },
             {
                 path: '/login',
-                element: <HotelList/>
+                element: <Login/>
             },
             {
                 path: '/signup',
-                element: <HotelList/>
+                element: <SignUp/>
             }
         ]
     }

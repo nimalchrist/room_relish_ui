@@ -37,20 +37,20 @@
 }
 .hotel-card-content h4{
     font-family: "Montserrat", sans-serif;
-    font-weight: bold;
+    font-weight: 400;
     margin: 20px auto;
     font-size: 20px;
 }
 .hotel-card-content p{
     font-family: "Montserrat", sans-serif;
-    font-weight: bold;
+    font-weight: 400;
     margin: 20px auto;
     font-size: 14px;
 }
 .hotel-card-content h2{
     margin: 20px auto;
     font-family: "Montserrat", sans-serif;
-    font-weight: bold;
+    font-weight: 400;
     font-size: 24px;
 }
 .hotel-list-page .show-more-button{
