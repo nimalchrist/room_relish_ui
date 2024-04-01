@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import StyledButton from "../components/customised/StyledButton";
+import {useState} from "react";
+import {Alert, Snackbar} from "@mui/material";
 
 function Copyright(props) {
     return (
@@ -27,13 +29,62 @@ function Copyright(props) {
 }
 const defaultTheme = createTheme();
 export default function Login() {
-    const handleSubmit = (event) => {
+
+    const [snackBarOpen, setSnackBarOpen] = useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState("");
+    const [snackBarSeverity, setSnackBarSeverity] = useState("");
+    const navigate = useNavigate();
+
+    const handleCloseSnackbar = (event, reason) =>{
+        if (reason === 'clickaway'){
+            return;
+        }
+        setSnackBarOpen(false);
+    }
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+    const isValidPassword = (password) => {
+        return password.length >= 8;
+    };
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        const email = data.get('email');
+        const password = data.get('password');
+
+        if (!isValidEmail(email)) {
+            setSnackBarOpen(true);
+            setSnackBarMessage("Please enter a valid email address.");
+            setSnackBarSeverity("error");
+            return;
+        }
+
+        if (!isValidPassword(password)) {
+            setSnackBarOpen(true);
+            setSnackBarMessage("Please enter a valid password");
+            setSnackBarSeverity("error");
+            return;
+        }
+
+        try{
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+            if (!response.ok){
+                navigate('/login?set=true');
+            }
+            navigate('/?set=true');
+        }catch (e) {
+            console.error(e.toString());
+        }
     };
 
     return (
@@ -98,6 +149,9 @@ export default function Login() {
                 </Box>
                 <Copyright sx={{ mt: 8, mb: 4 }} />
             </Container>
+            <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackBarSeverity}>{snackBarMessage}</Alert>
+            </Snackbar>
         </ThemeProvider>
     );
 }

@@ -4,7 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import StyledButton from "../components/customised/StyledButton";
+import {useState} from "react";
+import {Alert, Snackbar} from "@mui/material";
 
 function Copyright(props) {
     return (
@@ -28,13 +30,63 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-    const handleSubmit = (event) => {
+    const [snackBarOpen, setSnackBarOpen] = useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState("");
+    const [snackBarSeverity, setSnackBarSeverity] = useState("");
+    const navigate = useNavigate();
+
+    const handleCloseSnackbar = (event, reason) =>{
+        if (reason === 'clickaway'){
+            return;
+        }
+        setSnackBarOpen(false);
+    }
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+    const isValidPassword = (password) => {
+        return password.length >= 8;
+    };
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        const email = data.get('email');
+        const password = data.get('password');
+
+        if (!isValidEmail(email)) {
+            setSnackBarOpen(true);
+            setSnackBarMessage("Please enter a valid email address.");
+            setSnackBarSeverity("error");
+            return;
+        }
+
+        if (!isValidPassword(password)) {
+            setSnackBarOpen(true);
+            setSnackBarMessage("Please enter a valid password");
+            setSnackBarSeverity("error");
+            return;
+        }
+
+        try{
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+            if (!response.ok){
+                setSnackBarOpen(true);
+                setSnackBarMessage(response.json());
+                setSnackBarSeverity('error');
+            }
+            navigate('/login');
+        }catch (e) {
+            console.error(e.toString());
+        }
     };
 
     return (
@@ -55,6 +107,7 @@ export default function SignUp() {
                     <Typography component="h1" variant="h5">
                         Sign up
                     </Typography>
+                    {/*denoting the box as form*/}
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
@@ -125,6 +178,9 @@ export default function SignUp() {
                 </Box>
                 <Copyright sx={{ mt: 5 }} />
             </Container>
+            <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackBarSeverity}>{snackBarMessage}</Alert>
+            </Snackbar>
         </ThemeProvider>
     );
 }

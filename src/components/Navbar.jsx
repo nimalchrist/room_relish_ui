@@ -6,20 +6,29 @@ import {useEffect, useState} from "react";
 const Navbar = () => {
     const navigate = useNavigate();
     const [loginStatus, setLoginStatus] = useState(false);
+    const queryParameters = new URLSearchParams(window.location.search);
 
-    const handleSignUp = () => {
-        setLoginStatus(true);
-        navigate('/signup');
-    }
-
+    const checkLogin = () => {
+        console.log("i am called at initial render");
+        if (queryParameters.get('set') === 'true') {
+            setLoginStatus(true);
+        }
+    };
     const handleLogin = () => {
-        setLoginStatus(true);
         navigate('/login');
     }
-
+    const handleSignUp = () => {
+        navigate('/signup');
+    }
     const handleHomeClick = () => {
         navigate('/');
     }
+
+    useEffect(() => {
+        checkLogin();
+    }, [checkLogin, handleLogin, handleSignUp]);
+
+
     return (
         <div className="nav-bar">
             <div className="nav-title" onClick={handleHomeClick} style={{cursor: "pointer"}}>
@@ -37,7 +46,7 @@ const Navbar = () => {
                         </div>
                     :
                     <div>
-
+                        <h4>User profile</h4>
                     </div>
             }
         </div>
