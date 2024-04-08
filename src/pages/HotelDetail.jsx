@@ -1,8 +1,20 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {CircularProgress, Paper, Rating, Table, TableBody, TableCell, TableContainer, TableRow} from "@mui/material";
+import {
+    Alert,
+    CircularProgress,
+    Paper,
+    Rating,
+    Snackbar,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow
+} from "@mui/material";
 import "../assets/styles/HotelDetailsPage.css";
 import StyledButton from "../components/customised/StyledButton";
+import * as React from "react";
 
 
 function HotelDetail() {
@@ -10,6 +22,7 @@ function HotelDetail() {
     const {hotelId} = useParams();
     const navigate = useNavigate()
     const queryParameter = new URLSearchParams(window.location.search);
+    const [snackBarOpen, setSnackBarOpen] = useState(false);
     const fetchHotelSpecificData = async () => {
         try {
             const url = `http://localhost:3200/hotels/${hotelId}`;
@@ -21,16 +34,34 @@ function HotelDetail() {
         }
     }
     const handleButtonClick = (roomId) => {
-        const queryString = `?q=${encodeURIComponent(
-            roomId
-        )}&checkIn=${encodeURIComponent(
-            queryParameter.get('checkIn')
-        )}&checkOut=${encodeURIComponent(
-            queryParameter.get('checkOut')
-        )}&rooms=${encodeURIComponent(
-            queryParameter.get('rooms')
-        )}`;
-        navigate(`/hotel-list/${hotelId}/booking${queryString}`);
+        let queryString = "";
+        let userId = queryParameter.get('userId');
+
+        if(userId !== 'null'){
+            queryString = `?q=${encodeURIComponent(
+                roomId
+            )}&checkIn=${encodeURIComponent(
+                queryParameter.get('checkIn')
+            )}&checkOut=${encodeURIComponent(
+                queryParameter.get('checkOut')
+            )}&rooms=${encodeURIComponent(
+                queryParameter.get('rooms').trim()
+            )}&userId=${encodeURIComponent(
+                userId.trim()
+            )}`;
+            // go to booking page
+            navigate(`/hotel-list/${hotelId}/booking${queryString}`);
+        }
+        else{
+            setSnackBarOpen(true);
+        }
+
+    }
+    const handleCloseSnackbar = (event, reason) =>{
+        if (reason === 'clickaway'){
+            return;
+        }
+        setSnackBarOpen(false);
     }
 
     useEffect(() => {
@@ -79,6 +110,9 @@ function HotelDetail() {
                                 </Table>
                             </TableContainer>
                         </div>
+                        <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                            <Alert onClose={handleCloseSnackbar} severity='error'>Please login to continue</Alert>
+                        </Snackbar>
                     </>
                 ) : (
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>

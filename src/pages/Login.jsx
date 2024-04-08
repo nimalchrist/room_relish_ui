@@ -45,7 +45,7 @@ export default function Login() {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
     const isValidPassword = (password) => {
-        return password.length >= 8;
+        return password.length >= 0;
     };
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -68,8 +68,9 @@ export default function Login() {
         }
 
         try{
-            const response = await fetch('', {
+            const response = await fetch('http://localhost:8081/login', {
                 method: 'POST',
+                mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -78,12 +79,18 @@ export default function Login() {
                     password
                 })
             });
-            if (!response.ok){
-                navigate('/login?set=true');
+            const data = await response.json();
+            if (response.status === 200) {
+                navigate(`/?clientId=${data.id}`);
+            }else{
+                setSnackBarOpen(true);
+                setSnackBarMessage("Login failed. Please check your credentials");
+                setSnackBarSeverity('error');
             }
-            navigate('/?set=true');
-        }catch (e) {
-            console.error(e.toString());
+        }catch (error) {
+            setSnackBarOpen(true);
+            setSnackBarMessage("Login failed. Please check your credentials");
+            setSnackBarSeverity('error');
         }
     };
 

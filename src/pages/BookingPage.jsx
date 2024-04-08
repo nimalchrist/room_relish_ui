@@ -30,7 +30,6 @@ function BookingPage() {
         if (!roomData || !queryParameter.get('checkIn') || !queryParameter.get('checkOut') || !queryParameter.get('rooms')) {
             return 0;
         }
-
         const baseFare = roomData.roomRate;
         const numberOfRooms = parseInt(queryParameter.get('rooms'), 10);
         const days = numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'));
@@ -53,13 +52,31 @@ function BookingPage() {
         }
     }
 
-    function handlePaymentButtonClick() {
-        const queryString = `?days=${encodeURIComponent(
-            numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'))
-        )}&rooms=${encodeURIComponent(
-            queryParameter.get('rooms')
-        )}`;
-        navigate(`/hotel-list/${hotelId}/booking/${roomId}${queryString}`);
+    async function handlePaymentButtonClick() {
+        const response = await fetch("http://localhost:8081/book",{
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "_userId": queryParameter.get("userId"),
+                "_hotelId": hotelId,
+                "_roomId": roomId,
+                "numOfRooms": queryParameter.get("rooms"),
+                "numOfDays": numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'))
+            })
+        });
+        if (response.status === 200){
+            const queryString = `?days=${encodeURIComponent(
+                numberOfDays(queryParameter.get('checkIn'), queryParameter.get('checkOut'))
+            )}&rooms=${encodeURIComponent(
+                queryParameter.get('rooms')
+            )}&amount=${computeTotal()}`;
+            navigate(`/hotel-list/${hotelId}/booking/${roomId}${queryString}`);
+        }else{
+
+        }
     }
 
     // jsx layout
@@ -105,14 +122,6 @@ function BookingPage() {
                                         <tr>
                                             <td>Rooms count</td>
                                             <td className='second'>{queryParameter.get('rooms')}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>GST charges</td>
-                                            <td className='second'>Rs. 50</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Transaction charges</td>
-                                            <td className='second'>Rs. 20</td>
                                         </tr>
                                         </tbody>
                                     </table>

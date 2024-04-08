@@ -15,6 +15,34 @@ function HotelList() {
     }, []);
     const fetchHotelListData = async () => {
         try {
+            // const query = `
+            //     query GetHotels($cityName: String!){
+            //         search(cityName: $cityName){
+            //             hotelName
+            //             hoteType
+            //             id
+            //             images
+            //             location{
+            //                 address
+            //                 cityName
+            //             }
+            //             rating
+            //             numReviews
+            //             ratePerNight
+            //         }
+            //     }
+            // `;
+            // const variables = {
+            //     cityName: queryParameter.get('q')
+            // }
+            // const response = await fetch('http://localhost:8081/search/graphql', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ query, variables }),
+            // });
+
             const response = await fetch(`http://localhost:3200/hotels/search?${queryParameter}`);
             if (!response.ok) {
                 setNoData(true);
@@ -53,7 +81,7 @@ function HotelList() {
                             hotelAddress={hotel.location.address}
                             hotelRating={hotel.rating}
                             totalReviews={hotel.numReviews}
-                            basePrice={hotel.ratePerNight}
+                            basePrice={hotel.priceStartingFrom}
                             hotelImage={hotel.images[0]}
                             hotelId={hotel._id}
                             checkIn={queryParameter.get('checkIn')}

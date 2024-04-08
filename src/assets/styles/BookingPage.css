@@ -28,7 +28,7 @@
     width: 80%;
     margin: 20px auto;
     padding: 35px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
     font-family: "Montserrat", sans-serif;
     text-align: center;
 }
@@ -86,5 +86,5 @@
 .booking-container .payment-details div table tbody tr .result{
     text-align: right;
     font-weight: bold;
-    padding-left: 76px;
+    padding-left: 45px;
 }

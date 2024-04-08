@@ -17,6 +17,8 @@ function HeroSearch() {
     const [snackBarOpen, setSnackBarOpen] = useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState('');
     const navigate = useNavigate();
+    const queryParameter =  new URLSearchParams(window.location.search);
+
     function handleDestination(e) {
         setDestination(e.target.value);
     }
@@ -42,13 +44,35 @@ function HeroSearch() {
                 setSnackBarOpen(true);
                 return;
             }
-            const queryString = `?q=${encodeURIComponent(
-                destination
-            )}&checkIn=${encodeURIComponent(
-                checkIn
-            )}&checkOut=${encodeURIComponent(
-                checkOut
-            )}&rooms=${encodeURIComponent(numberOfRooms)}`;
+            let userId = queryParameter.get('clientId');
+            let queryString = '';
+            if (userId){
+                queryString = `?q=${encodeURIComponent(
+                    destination
+                )}&checkIn=${encodeURIComponent(
+                    checkIn
+                )}&checkOut=${encodeURIComponent(
+                    checkOut
+                )}&rooms=${encodeURIComponent(
+                    numberOfRooms
+                )}&userId=${encodeURIComponent(
+                    userId.trim()
+                )}
+            `;
+            }
+            else{
+                queryString = `?q=${encodeURIComponent(
+                    destination
+                )}&checkIn=${encodeURIComponent(
+                    checkIn
+                )}&checkOut=${encodeURIComponent(
+                    checkOut
+                )}&rooms=${encodeURIComponent(
+                    numberOfRooms
+                )}
+            `;
+            }
+
             navigate(`/hotel-list${queryString}`);
         } else {
             console.log("I am clicked but in else part");
