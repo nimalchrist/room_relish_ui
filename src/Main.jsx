@@ -1,66 +1,15 @@
-import Home from "./pages/Home";
-import "./assets/styles/Main.css";
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import Layout from "./Layout";
-import HotelList from "./pages/HotelList";
-import HotelDetail from "./pages/HotelDetail";
-import BookingPage from "./pages/BookingPage";
-import PaymentsPage from "./pages/PaymentsPage";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./index.css";
+import theme from "./utils/theme/theme.jsx";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <Layout/>,
-        errorElement: <div>404 Not found</div>,
-        children: [
-            {
-                index: true,
-                element: <Home/>
-            },
-            {
-                path: '/hotel-list',
-                element: <HotelList/>
-            },
-            {
-                path: '/hotel-list/:hotelId',
-                element: <HotelDetail/>
-            },
-            {
-                path: '/hotel-list/:hotelId/booking',
-                element: <BookingPage/>
-            },
-            {
-                path: '/hotel-list/:hotelId/booking/:roomId',
-                element: <PaymentsPage/>
-            },
-            {
-                path: '/login',
-                element: <Login/>
-            },
-            {
-                path: '/signup',
-                element: <SignUp/>
-            }
-        ]
-    }
-]);
-
-function Main() {
-    return (
-        <div className="App">
-            <RouterProvider router={router}/>
-            {/*<BrowserRouter>*/}
-            {/*    <Routes>*/}
-            {/*        <Route path="/" element={<Layout/>}>*/}
-            {/*            <Route index element={<Home/>}/>*/}
-            {/*            <Route path="hotel-list" element={<HotelList/>}></Route>*/}
-            {/*        </Route>*/}
-            {/*    </Routes>*/}
-            {/*</BrowserRouter>*/}
-        </div>
-    );
-}
-
-export default Main;
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>
+);

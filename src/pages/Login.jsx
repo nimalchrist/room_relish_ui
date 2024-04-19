@@ -1,164 +1,206 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import {Link, useNavigate} from "react-router-dom";
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import StyledButton from "../components/customised/StyledButton";
-import {useState} from "react";
-import {Alert, Snackbar} from "@mui/material";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import { CircularProgress } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import { Link } from "react-router-dom";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import theme from "../utils/theme/theme";
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link to="http://localhost:3000/" style={{color: "inherit"}}>
-                Room Relish
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-const defaultTheme = createTheme();
-export default function Login() {
+const Login = () => {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const [snackBarOpen, setSnackBarOpen] = useState(false);
-    const [snackBarMessage, setSnackBarMessage] = useState("");
-    const [snackBarSeverity, setSnackBarSeverity] = useState("");
-    const navigate = useNavigate();
+  const handlePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+  const handleLoginSuccess = (message) => {
+    setSnackbarSeverity("success");
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+    navigate("/");
+  };
 
-    const handleCloseSnackbar = (event, reason) =>{
-        if (reason === 'clickaway'){
-            return;
-        }
-        setSnackBarOpen(false);
+  const handleLoginFailure = (message) => {
+    setSnackbarSeverity("error");
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+  const handleSubmit = async (event) => {
+    setLoading(true);
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const email = data.get("email");
+    const password = data.get("password");
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Please enter a valid Email Address.");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
     }
-    const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
-    const isValidPassword = (password) => {
-        return password.length >= 0;
-    };
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const email = data.get('email');
-        const password = data.get('password');
 
-        if (!isValidEmail(email)) {
-            setSnackBarOpen(true);
-            setSnackBarMessage("Please enter a valid email address.");
-            setSnackBarSeverity("error");
-            return;
-        }
+    if (!password.trim()) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Please enter a password");
+      setSnackbarOpen(true);
+      setLoading(false);
+    }
 
-        if (!isValidPassword(password)) {
-            setSnackBarOpen(true);
-            setSnackBarMessage("Please enter a valid password");
-            setSnackBarSeverity("error");
-            return;
-        }
-
-        try{
-            const response = await fetch('http://localhost:8081/login', {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    password
-                })
-            });
-            const data = await response.json();
-            if (response.status === 200) {
-                navigate(`/?clientId=${data.id}`);
-            }else{
-                setSnackBarOpen(true);
-                setSnackBarMessage("Login failed. Please check your credentials");
-                setSnackBarSeverity('error');
-            }
-        }catch (error) {
-            setSnackBarOpen(true);
-            setSnackBarMessage("Login failed. Please check your credentials");
-            setSnackBarSeverity('error');
-        }
+    const apiUrl = "http://localhost:3200/auth/login?by=local";
+    const requestData = {
+      email,
+      password,
     };
 
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
+    try {
+      const response = await axios.post(apiUrl, requestData, {
+        withCredentials: true,
+      });
+      handleLoginSuccess(response.data.message);
+    } catch (error) {
+      console.error("API error:", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        handleLoginFailure("Login failed: " + error.response.data.message);
+      } else {
+        handleLoginFailure("Login failed. Please check your credentials.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Grid container component="main" sx={{ height: "auto" }}>
+        <CssBaseline />
+        <Grid
+          item
+          xs={6}
+          component={Paper}
+          elevation={1}
+          square
+          sx={{
+            margin: "10px auto",
+          }}>
+          <Box
+            sx={{
+              m: 2,
+              display: "flex",
+              flexDirection: "column",
+              padding: "60px",
+            }}>
+            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+              LOGIN
+            </Typography>
+            <Typography sx={{ mb: 2 }}>
+              Login to access your RoomRelish Account
+            </Typography>
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit}
+              sx={{ mt: 3 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    autoComplete="new-password"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handlePasswordVisibility}>
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign in
-                    </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
-                        <StyledButton
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Sign In
-                        </StyledButton>
-                        <Grid container>
-                            <Grid item>
-                                <Link to="/signup" variant="body2">
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-                <Copyright sx={{ mt: 8, mb: 4 }} />
-            </Container>
-            <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snackBarSeverity}>{snackBarMessage}</Alert>
-            </Snackbar>
-        </ThemeProvider>
-    );
-}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox value="allowExtraEmails" color="primary" />
+                    }
+                    label="Remember me"
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading}>
+                {loading ? <CircularProgress size={26} /> : "Login"}
+              </Button>
+              <Grid container justifyContent="flex-end">
+                <Grid item>
+                  Don't have an account?{" "}
+                  <Link to="/signup" variant="body2">
+                    Signup
+                  </Link>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}>
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}>
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
+    </>
+  );
+};
+
+export default Login;

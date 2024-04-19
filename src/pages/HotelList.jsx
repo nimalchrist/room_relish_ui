@@ -1,100 +1,139 @@
-import HotelCard from "../components/hotel-list-section/HotelCard";
-import "../assets/styles/HotelListPage.css";
-import {useEffect, useState} from "react";
-import StyledButton from "../components/customised/StyledButton";
+import React, { useState, useEffect } from "react";
+import AfterSearchContainer from "../components/Search/AfterSearchContainer.jsx";
+import FilterSection from "../components/HotelList/FilterSection.jsx";
+import HotelsViewport from "../components/HotelList/HotelsViewport.jsx";
+import DataNotFound from "../components/HotelList/Components/NoResult.jsx";
 
-function HotelList() {
-    const queryParameter = new URLSearchParams(window.location.search);
-    const [hotels, setHotels] = useState([]);
-    const [displayHotels, setDisplayHotels] = useState([]);
-    const [showMore, setShowMore] = useState(true);
-    const [noData, setNoData] = useState(false);
+const HotelList = () => {
+  // query parameters
+  const queryParameters = new URLSearchParams(window.location.search);
+  const destination = queryParameters.get("q");
+  const checkInDate = queryParameters.get("checkIn");
+  const checkOutDate = queryParameters.get("checkOut");
+  const numberOfRooms = parseInt(queryParameters.get("rooms"));
 
-    useEffect( () => {
-        fetchHotelListData();
-    }, []);
-    const fetchHotelListData = async () => {
-        try {
-            // const query = `
-            //     query GetHotels($cityName: String!){
-            //         search(cityName: $cityName){
-            //             hotelName
-            //             hoteType
-            //             id
-            //             images
-            //             location{
-            //                 address
-            //                 cityName
-            //             }
-            //             rating
-            //             numReviews
-            //             ratePerNight
-            //         }
-            //     }
-            // `;
-            // const variables = {
-            //     cityName: queryParameter.get('q')
-            // }
-            // const response = await fetch('http://localhost:8081/search/graphql', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ query, variables }),
-            // });
+  // state variables
+  const [dest, setDest] = useState(destination);
+  const [In, setIn] = useState(checkInDate);
+  const [Out, setOut] = useState(checkOutDate);
+  const [rooms, setRooms] = useState(numberOfRooms);
 
-            const response = await fetch(`http://localhost:3200/hotels/search?${queryParameter}`);
-            if (!response.ok) {
-                setNoData(true);
-                return;
-            }
-            const data = await response.json();
-            if(Array.isArray(data)){
-                setHotels(data);
-                setDisplayHotels(data.slice(0, 4));
-            }else{
-                setNoData(true);
-            }
-        } catch (e) {
-            console.error(e);
-            setNoData(true);
-        }
-    }
+  // filter state variables
+  const [selectedPrice, setSelectedPrice] = useState([599, 20000]);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [amenities, setAmenities] = useState([
+    { id: 1, label: "Airport shuttle", checked: false },
+    { id: 2, label: "Restaurant", checked: false },
+    { id: 3, label: "Family rooms", checked: false },
+    { id: 4, label: "Good breakfast", checked: false },
+  ]);
+  const [extraAmenities, setExtraAmenities] = useState([
+    { id: 5, label: "Free Wi-Fi", checked: false },
+    { id: 6, label: "Room service", checked: false },
+    { id: 7, label: " Free-parking ", checked: false },
+    { id: 8, label: "Spa and wellness centre", checked: false },
+    { id: 9, label: "Non-smoking rooms ", checked: false },
+    { id: 10, label: "Facilities for disabled guests", checked: false },
+  ]);
 
-    const handleShowMoreClick = () => {
-        if (showMore) {
-            setDisplayHotels(hotels);
-            setShowMore(false);
-        } else {
-            setDisplayHotels(hotels.slice(0, 4));
-            setShowMore(true);
-        }
-    }
-    return (
-        <>
-            <div className="hotel-list-page">
-                <h4>Showing the {displayHotels.length} of {hotels.length}  results</h4>
-                {noData ? <div> <h1>No data found</h1></div> :
-                    displayHotels.map((hotel)=>{
-                        return <HotelCard
-                            hotelName={hotel.hotelName}
-                            hotelAddress={hotel.location.address}
-                            hotelRating={hotel.rating}
-                            totalReviews={hotel.numReviews}
-                            basePrice={hotel.priceStartingFrom}
-                            hotelImage={hotel.images[0]}
-                            hotelId={hotel._id}
-                            checkIn={queryParameter.get('checkIn')}
-                            checkOut={queryParameter.get('checkOut')}
-                            rooms={queryParameter.get('rooms')}
-                        />
-                    })}
-                {displayHotels.length > 3 &&
-                <StyledButton className="show-more-button" onClick={handleShowMoreClick}>{(showMore) ? "Show More" : "Hide"}</StyledButton>}
-            </div>
-        </>
+  // search results array
+  const [searchResults, setSearchResults] = useState([]);
 
+  // handlers
+  const handleSelectedPrice = (e, newValue) => {
+    setSelectedPrice(newValue);
+  };
+  const handleSelectedRating = (value) => {
+    setSelectedRating(value);
+  };
+
+  const handleAmenitiesChange = (id) => (event) => {
+    const updatedAmenities = amenities.map((amenity) =>
+      amenity.id === id
+        ? { ...amenity, checked: event.target.checked }
+        : amenity
     );
-}
+    setAmenities(updatedAmenities);
+  };
+  const handleExtraAmenitiesChange = (id) => (event) => {
+    const updatedAmenities = extraAmenities.map((amenity) =>
+      amenity.id === id
+        ? { ...amenity, checked: event.target.checked }
+        : amenity
+    );
+    setExtraAmenities(updatedAmenities);
+  };
+
+  const handleSearch = async () => {
+    try {
+      const selectedAmenitiesIds = [...amenities, ...extraAmenities]
+        .filter((amenity) => amenity.checked)
+        .map((amenity) => amenity.label);
+
+      const url = `http://localhost:3200/hotels/search?q=${encodeURIComponent(
+        dest
+      )}&checkIn=${encodeURIComponent(In)}&checkOut=${encodeURIComponent(
+        Out
+      )}&rooms=${encodeURIComponent(rooms)}&amenities=${encodeURIComponent(
+        selectedAmenitiesIds.join(",")
+      )}&priceRanges=${encodeURIComponent(
+        JSON.stringify(selectedPrice)
+      )}&rating=${encodeURIComponent(selectedRating)}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error("Error occurred during fetch:", error);
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    handleSearch();
+  }, [selectedPrice, selectedRating, amenities, extraAmenities]);
+
+  return (
+    <div
+      style={{
+        height: "auto",
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+      }}>
+      <AfterSearchContainer
+        destination={dest}
+        checkIn={In}
+        checkOut={Out}
+        rooms={rooms}
+        setDestination={setDest}
+        setCheckIn={setIn}
+        setCheckOut={setOut}
+        setRooms={setRooms}
+        handleSearch={handleSearch}
+      />
+      <FilterSection
+        amenities={amenities}
+        extraAmenities={extraAmenities}
+        selectedPrice={selectedPrice}
+        selectedRating={selectedRating}
+        handleSelectedPrice={handleSelectedPrice}
+        handleSelectedRating={handleSelectedRating}
+        handleAmenitiesChange={handleAmenitiesChange}
+        handleExtraAmenitiesChange={handleExtraAmenitiesChange}
+      />
+      {!Array.isArray(searchResults) ? (
+        <DataNotFound />
+      ) : (
+        <HotelsViewport
+          listOfHotels={searchResults}
+          checkIn={In}
+          checkOut={Out}
+          rooms={rooms}
+        />
+      )}
+    </div>
+  );
+};
 
 export default HotelList;

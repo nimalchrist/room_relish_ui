@@ -1,186 +1,318 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import {Link, useNavigate} from "react-router-dom";
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import StyledButton from "../components/customised/StyledButton";
-import {useState} from "react";
-import {Alert, Snackbar} from "@mui/material";
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import { CircularProgress } from "@mui/material";
+import { Link } from "react-router-dom";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import theme from "../utils/theme/theme";
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" to="/">
-                Room Relish
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
+export default function SignInSide() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const handlePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+  const handleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(
+      (prevShowConfirmPassword) => !prevShowConfirmPassword
     );
-}
-const defaultTheme = createTheme();
+  };
 
-export default function SignUp() {
-    const [snackBarOpen, setSnackBarOpen] = useState(false);
-    const [snackBarMessage, setSnackBarMessage] = useState("");
-    const [snackBarSeverity, setSnackBarSeverity] = useState("");
-    const navigate = useNavigate();
+  const handleRegistrationSuccess = (message) => {
+    setSnackbarSeverity("success");
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+    navigate("/login");
+  };
 
-    const handleCloseSnackbar = (event, reason) =>{
-        if (reason === 'clickaway'){
-            return;
-        }
-        setSnackBarOpen(false);
+  const handleRegistrationFailure = (message) => {
+    setSnackbarSeverity("error");
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSubmit = async (event) => {
+    setLoading(true);
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const firstName = data.get("firstName");
+    const lastName = data.get("lastName");
+    const email = data.get("email");
+    const phoneNumber = data.get("phone");
+    const password = data.get("password");
+    const confirmPassword = data.get("confirmPassword");
+
+    // Basic validation checks
+    if (!firstName.trim()) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Firstname is required");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
     }
-    const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!lastName.trim()) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Lastname is required");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+
+    if (!email.trim()) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Email address is required");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Please enter a valid Email Address.");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Phone number must be 10 digits");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+    if (!password.trim()) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Password is required");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Passwords do not match");
+      setSnackbarOpen(true);
+      setLoading(false);
+      return;
+    }
+    const apiUrl = "http://localhost:3200/auth/register";
+    const requestData = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      password,
+      confirmPassword,
     };
-    const isValidPassword = (password) => {
-        return password.length >= 8;
-    };
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const email = data.get('email');
-        const password = data.get('password');
+    try {
+      const response = await axios.post(apiUrl, requestData);
+      handleRegistrationSuccess(response.data.message);
+    } catch (error) {
+      console.error("API error:", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        handleRegistrationFailure(
+          "Registration failed: " + error.response.data.message
+        );
+      } else {
+        handleRegistrationFailure(
+          "Registration failed. Please check your credentials."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <>
+      <Box sx={{ height: "auto" }}>
+        <Grid container component="main" height="auto">
+          <CssBaseline />
+          <Grid
+            item
+            xs={6}
+            sx={{
+              margin: "0px auto",
+            }}
+            component={Paper}
+            elevation={1}
+            square>
+            <Box
+              sx={{
+                my: 8,
+                mx: 4,
+                display: "flex",
+                flexDirection: "column",
+                padding: "5px",
+              }}>
+              <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+                Sign up
+              </Typography>
 
-        if (!isValidEmail(email)) {
-            setSnackBarOpen(true);
-            setSnackBarMessage("Please enter a valid email address.");
-            setSnackBarSeverity("error");
-            return;
-        }
-
-        if (!isValidPassword(password)) {
-            setSnackBarOpen(true);
-            setSnackBarMessage("Please enter a valid password");
-            setSnackBarSeverity("error");
-            return;
-        }
-
-        try{
-            const response = await fetch('', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    password
-                })
-            });
-            if (!response.ok){
-                setSnackBarOpen(true);
-                setSnackBarMessage(response.json());
-                setSnackBarSeverity('error');
-            }
-            navigate('/login');
-        }catch (e) {
-            console.error(e.toString());
-        }
-    };
-
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign up
-                    </Typography>
-                    {/*denoting the box as form*/}
-                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    autoComplete="given-name"
-                                    name="firstName"
-                                    required
-                                    fullWidth
-                                    id="firstName"
-                                    label="First Name"
-                                    autoFocus
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="lastName"
-                                    label="Last Name"
-                                    name="lastName"
-                                    autoComplete="family-name"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
-                                    autoComplete="email"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    id="password"
-                                    autoComplete="new-password"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControlLabel
-                                    control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                    label="I want to receive inspiration, marketing promotions and updates via email."
-                                />
-                            </Grid>
-                        </Grid>
-                        <StyledButton
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Sign Up
-                        </StyledButton>
-                        <Grid container justifyContent="flex-end">
-                            <Grid item>
-                                <Link to="/login" variant="body2">
-                                    Already have an account? Sign in
-                                </Link>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-                <Copyright sx={{ mt: 5 }} />
-            </Container>
-            <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snackBarSeverity}>{snackBarMessage}</Alert>
-            </Snackbar>
-        </ThemeProvider>
-    );
+              <Typography sx={{ mb: 2 }}>
+                Let's get you all set up so that you can access your own account
+              </Typography>
+              <Box
+                component="form"
+                noValidate
+                onSubmit={handleSubmit}
+                sx={{ mt: 3 }}>
+                <Grid container spacing={1.4}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      autoComplete="given-name"
+                      name="firstName"
+                      required
+                      fullWidth
+                      id="firstName"
+                      label="First Name"
+                      InputLabelProps={{ style: { color: "black" } }}
+                      autoFocus
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="lastName"
+                      label="Last Name"
+                      InputLabelProps={{ style: { color: "black" } }}
+                      name="lastName"
+                      autoComplete="family-name"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email Address"
+                      InputLabelProps={{ style: { color: "black" } }}
+                      name="email"
+                      autoComplete="email"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      required
+                      fullWidth
+                      id="phone"
+                      label="Phone Number"
+                      name="phone"
+                      InputLabelProps={{ style: { color: "black" } }}
+                      autoComplete="phone"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="password"
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      InputLabelProps={{ style: { color: "black" } }}
+                      id="password"
+                      autoComplete="new-password"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handlePasswordVisibility}>
+                              {showPassword ? (
+                                <Visibility />
+                              ) : (
+                                <VisibilityOff />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      name="confirmPassword"
+                      label="Confirm Password"
+                      InputLabelProps={{ style: { color: "black" } }}
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      autoComplete="new-password"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={handleConfirmPasswordVisibility}>
+                              {showConfirmPassword ? (
+                                <Visibility />
+                              ) : (
+                                <VisibilityOff />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, bgcolor: theme.palette.primary.main }}
+                  disabled={loading}>
+                  {!loading ? "Signup" : <CircularProgress size={26} />}
+                </Button>
+                <Grid container justifyContent="flex-end">
+                  <Grid item>
+                    Already have an account?{" "}
+                    <Link to="/login" variant="body2">
+                      Login
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}>
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}>
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
+    </>
+  );
 }

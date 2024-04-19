@@ -1,13 +1,14 @@
-// TODO: home page of the UI
-import HeroSection from "../components/hero-section/HeroSection";
-import "../assets/styles/Home.css";
-function Home() {
-    return(
-      <>
-        <div className="home-page">
-            <HeroSection/>
-        </div>
-      </>
-    );
-}
+import React from "react";
+import Hero from "../components/Header/Hero";
+import HomeContent from "../components/Search/HomeContent";
+
+const Home = () => {
+  return (
+    <div style={{ marginBottom: "120px" }}>
+      <Hero />
+      <HomeContent />
+    </div>
+  );
+};
+
 export default Home;
