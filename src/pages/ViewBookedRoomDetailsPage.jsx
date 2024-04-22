@@ -2,9 +2,36 @@ import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import BookedDetailsHeader from "../components/ViewBookedRoomDetails/BookedDetailsHeader";
 import BookedDetailsCard from "../components/ViewBookedRoomDetails/BookedDetailsCard";
-import Terms from "../components/ViewBookedRoomDetails/Terms";
+import TermsAndConditions from "../components/ViewBookedRoomDetails/TermsAndConditions";
+import { useNavigate } from "react-router-dom";
 
 const ViewBookedRoomDetailsPage = () => {
+  const navigate = useNavigate();
+  // supportive method
+  const checkLoginStatus = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3200/auth/users/user/islogined",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        if (!responseData.success) {
+          navigate("/*");
+        }
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+    }
+  };
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
@@ -13,7 +40,7 @@ const ViewBookedRoomDetailsPage = () => {
       <Box sx={{ width: "80%", margin: "100px auto" }}>
         <BookedDetailsHeader />
         <BookedDetailsCard />
-        <Terms />
+        <TermsAndConditions />
       </Box>
     </div>
   );

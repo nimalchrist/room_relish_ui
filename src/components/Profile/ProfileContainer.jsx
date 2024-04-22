@@ -8,26 +8,26 @@ import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import axios from "axios";
+import profile from "../../assets/images/profile-images/Profile.png";
+import cover from "../../assets/images/profile-images/CoverPicture.png";
+import { useNavigate } from "react-router-dom";
 
-const Profilepage = () => {
+const ProfileContainer = () => {
+  const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState(profile);
+  const [coverImage, setCoverImage] = useState(cover);
   const [userName, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
   const profileInputRef = useRef(null);
   const coverImageInputRef = useRef(null);
-
-  const [profileImage, setProfileImage] = useState(
-    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pngarts.com%2Fexplore%2F215270&psig=AOvVaw1ptEVunFYZXRUCCFyrgx5_&ust=1691664654130000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLi0tYi0z4ADFQAAAAAdAAAAABAE"
-  );
-  const [coverImage, setCoverImage] = useState(
-    "https://s3-alpha-sig.figma.com/img/b911/29fb/09d33d4d260d902f404ce31c509b1086?Expires=1692576000&Signature=nMntYxuTFNKOuNcK4D-RIKbW10H2vjJPgRZMo40wtyfX7oZiNBWhq8Gm1EWnX7PwYx8mXQzfr9NjSYbpYWSeTfet6ZBN~es-t3BJaDa~fh6TfAoz7tjVeTax6zooZixFC27X9QXKQcw91tQVSMUwG1LUm8dK9d9EUznogN1DFsaZveuADWP40RWqmOjZnjP-M4jzGayNW7mPCToVExsNFwL74EBnNCtsYPOyrvVpEkBZqTFk5BQBinou8X46GK0b6BaYIoMPBiDJqhVjBt7IM5129VbTrXv2N~xN77ET6U5pAc41Yd6JhKXzmhGYU1qzP1mxwQm1ctSkbAiGSV5-RQ__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4"
-  );
 
   const [isNameEditing, setIsNameEditing] = useState(false);
   const [isPhoneNumberEditing, setIsPhoneNumberEditing] = useState(false);
@@ -59,6 +59,7 @@ const Profilepage = () => {
     },
   });
 
+  // handlers
   const handleError = (error) => {
     setSnackbarOpen(true);
     setSnackbarSeverity("error");
@@ -73,83 +74,6 @@ const Profilepage = () => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
-
-  // to fetch the profile fields
-  const fetchUserData = async () => {
-    console.log("called");
-    try {
-      const response = await axios.get(
-        "http://localhost:3200/auth/users/user/profile",
-        { withCredentials: true }
-      );
-
-      const userData = response.data;
-      // Update state with the retrieved user data
-      setName(userData.userName);
-      setEmail(userData.email);
-      setPhoneNumber(userData.phoneNumber);
-      setAddress(userData.address);
-      if (userData.dateOfBirth != null) {
-        const parsedDate = new Date(userData.dateOfBirth);
-        const formattedDate = parsedDate.toLocaleString("en-US", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        });
-        setDateOfBirth(formattedDate);
-        setOriginalDateOfBirth(formattedDate);
-      } else {
-        setDateOfBirth("");
-        setOriginalDateOfBirth("");
-      }
-
-      setOriginalName(userData.userName);
-      setOriginalEmail(userData.email);
-      setOriginalPhoneNumber(userData.phoneNumber);
-      setOriginalAddress(userData.address);
-    } catch (error) {
-      console.error("API error:", error);
-      handleError(error);
-    }
-  };
-
-  // to fetch the profile image
-  const fetchProfileImage = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3200/auth/users/user/profile/getpicture",
-        { type: "profile" },
-        { withCredentials: true }
-      );
-      const imageUrl = response.data.picture;
-      if (imageUrl != null) {
-        setProfileImage(imageUrl);
-      }
-    } catch (error) {
-      console.error("Fetch profile image error:", error);
-      handleError(error);
-    }
-  };
-
-  // fetch the cover image
-  const fetchCoverImage = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3200/auth/users/user/profile/getpicture",
-        { type: "cover" },
-        { withCredentials: true }
-      );
-
-      const imageUrl = response.data.picture;
-      if (imageUrl != null) {
-        setCoverImage(imageUrl);
-      }
-    } catch (error) {
-      console.error("Fetch cover image error:", error);
-      handleError(error);
-    }
-  };
-
   const handleCancel = () => {
     setName(originalName);
     setEmail(originalEmail);
@@ -161,7 +85,6 @@ const Profilepage = () => {
     setIsAddressEditing(false);
     setIsDateOfBirthEditing(false);
   };
-
   const handleImageChange = async (e, imageType) => {
     setSelectedImageType(imageType);
     const file = e.target.files[0];
@@ -200,7 +123,6 @@ const Profilepage = () => {
       handleError("Please select a JPG image file");
     }
   };
-
   const handleSave = async (event) => {
     event.preventDefault();
     if (isNameEditing && userName.length <= 0) {
@@ -264,51 +186,136 @@ const Profilepage = () => {
       }
     }
   };
-
-  const isJpgFile = (file) => {
-    return file.type === "image/jpeg";
-  };
-  const handleProfileImageReset = () => {
-    profileInputRef.current.value = null;
-    profileInputRef.current.click();
-  };
   const handleCoverImageReset = () => {
     coverImageInputRef.current.value = null;
     coverImageInputRef.current.click();
   };
 
-  useEffect(() => {
-    fetchUserData();
-    fetchCoverImage();
-    fetchProfileImage();
-  }, []);
+  // supportive methods
+  const checkLoginStatus = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3200/auth/users/user/islogined",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
+      if (response.ok) {
+        const responseData = await response.json();
+        if (!responseData.success) {
+          navigate("/*");
+        }
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+    }
+  };
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3200/auth/users/user/profile",
+        { withCredentials: true }
+      );
+
+      const userData = response.data;
+      setName(userData.userName);
+      setEmail(userData.email);
+      setPhoneNumber(userData.phoneNumber);
+      setAddress(userData.address);
+      if (userData.dateOfBirth != null) {
+        const parsedDate = new Date(userData.dateOfBirth);
+        const formattedDate = parsedDate.toLocaleString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+        setDateOfBirth(formattedDate);
+        setOriginalDateOfBirth(formattedDate);
+      } else {
+        setDateOfBirth("");
+        setOriginalDateOfBirth("");
+      }
+
+      setOriginalName(userData.userName);
+      setOriginalEmail(userData.email);
+      setOriginalPhoneNumber(userData.phoneNumber);
+      setOriginalAddress(userData.address);
+    } catch (error) {
+      console.error("API error:", error);
+      handleError(error);
+    }
+  };
+
+  const fetchProfileImage = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3200/auth/users/user/profile/getpicture",
+        { type: "profile" },
+        { withCredentials: true }
+      );
+      const imageUrl = response.data.picture;
+      if (imageUrl != null) {
+        setProfileImage(imageUrl);
+      }
+    } catch (error) {
+      console.error("Fetch profile image error:", error);
+      handleError(error);
+    }
+  };
+  const fetchCoverImage = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3200/auth/users/user/profile/getpicture",
+        { type: "cover" },
+        { withCredentials: true }
+      );
+
+      const imageUrl = response.data.picture;
+      if (imageUrl != null) {
+        setCoverImage(imageUrl);
+      }
+    } catch (error) {
+      console.error("Fetch cover image error:", error);
+      handleError(error);
+    }
+  };
+  const isJpgFile = (file) => {
+    return file.type === "image/jpeg";
+  };
   const isValidDate = (dateString) => {
     const currentDate = new Date();
     const enteredDate = new Date(dateString);
     return enteredDate < currentDate;
   };
 
+  useEffect(() => {
+    checkLoginStatus()
+      .then(fetchUserData)
+      .then(fetchCoverImage)
+      .then(fetchProfileImage)
+      .catch((error) => console.error("Error:", error));
+  }, []);
+
   return (
-    <div style={{ marginBottom: "90px" }}>
+    <>
       <form onSubmit={handleSave}>
-        <Box padding="60px">
+        <Box style={{ width: "100%" }}>
           <Box
             margin="70px auto"
             sx={{
               width: "90%",
               height: "auto",
               position: "relative",
-              backgroundColor: "ghostwhite",
-            }}
-          >
+            }}>
             <div
               style={{
                 position: "relative",
                 height: "50vh",
                 margin: "auto",
-              }}
-            >
+              }}>
               <img
                 src={coverImage}
                 alt="cover"
@@ -335,8 +342,7 @@ const Profilepage = () => {
                   width: "180px",
                   height: "180px",
                   padding: "5px",
-                }}
-              >
+                }}>
                 <img
                   src={profileImage}
                   alt="profile"
@@ -361,8 +367,7 @@ const Profilepage = () => {
                     cursor: "pointer",
                     zIndex: 1,
                   }}
-                  onClick={(e) => handleImageChange(e, "profile")}
-                >
+                  onClick={(e) => handleImageChange(e, "profile")}>
                   <Button onClick={() => profileInputRef.current?.click()}>
                     <div
                       style={{
@@ -373,8 +378,7 @@ const Profilepage = () => {
                         width: "35px",
                         marginLeft: "15px",
                         marginBottom: "0px",
-                      }}
-                    >
+                      }}>
                       <img src={pen} alt="Pen" style={{ width: "20px" }} />
                     </div>
                   </Button>
@@ -397,8 +401,7 @@ const Profilepage = () => {
                   right: "30px",
                   zIndex: 1,
                   color: "black",
-                }}
-              >
+                }}>
                 <CloudUploadIcon />
                 Upload new cover
               </Button>
@@ -411,29 +414,20 @@ const Profilepage = () => {
               </div>
             </Box>
           </Box>
-
           <Box
-            paddingTop="100px"
             sx={{
-              height: "592px",
-              width: "1232px",
-              marginLeft: "70px",
-              marginRight: "120px",
-              marginBottom: "300px",
-            }}
-          >
+              margin: "160px auto",
+              height: "auto",
+              width: "90%",
+            }}>
             <Typography variant="p3">Account</Typography> <br />
-            <Paper
-              elevation={4}
-              sx={{ padding: 4, width: "1232px", marginTop: 2 }}
-            >
+            <Paper elevation={2} sx={{ padding: 4, width: "100%", margin: 2 }}>
               <Grid container direction="column" spacing={4}>
                 <Grid
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Name:</Typography>
                     <br />
@@ -452,8 +446,7 @@ const Profilepage = () => {
                   <Grid item>
                     <Button
                       variant="outlined"
-                      onClick={() => setIsNameEditing(true)}
-                    >
+                      onClick={() => setIsNameEditing(true)}>
                       <Typography variant="p2">
                         <img src={Edit} />
                         Change
@@ -465,8 +458,7 @@ const Profilepage = () => {
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Email:</Typography>
                     <br />
@@ -478,8 +470,7 @@ const Profilepage = () => {
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Password:</Typography>
                     <br />
@@ -491,8 +482,7 @@ const Profilepage = () => {
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Phone Number:</Typography>
                     <br />
@@ -512,8 +502,7 @@ const Profilepage = () => {
                   <Grid item>
                     <Button
                       variant="outlined"
-                      onClick={() => setIsPhoneNumberEditing(true)}
-                    >
+                      onClick={() => setIsPhoneNumberEditing(true)}>
                       <Typography variant="p2">
                         <img src={Edit} />
                         Change
@@ -525,8 +514,7 @@ const Profilepage = () => {
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Address:</Typography>
                     <br />
@@ -545,8 +533,7 @@ const Profilepage = () => {
                   <Grid item>
                     <Button
                       variant="outlined"
-                      onClick={() => setIsAddressEditing(true)}
-                    >
+                      onClick={() => setIsAddressEditing(true)}>
                       <Typography variant="p2">
                         <img src={Edit} />
                         Change
@@ -558,8 +545,7 @@ const Profilepage = () => {
                   item
                   container
                   justifyContent="space-between"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Grid item>
                     <Typography variant="p2">Date of Birth:</Typography>
                     <br />
@@ -569,8 +555,9 @@ const Profilepage = () => {
                         variant="outlined"
                         id="dateOfBirth"
                         value={dateOfBirth}
-                        onChange={(e) => setDateOfBirth(e.target.value)}
-                      ></StyledTextField>
+                        onChange={(e) =>
+                          setDateOfBirth(e.target.value)
+                        }></StyledTextField>
                     ) : (
                       <Typography variant="p1">{dateOfBirth}</Typography>
                     )}
@@ -578,8 +565,7 @@ const Profilepage = () => {
                   <Grid item>
                     <Button
                       variant="outlined"
-                      onClick={() => setIsDateOfBirthEditing(true)}
-                    >
+                      onClick={() => setIsDateOfBirthEditing(true)}>
                       <Typography variant="p2">
                         <img src={Edit} />
                         Change
@@ -593,8 +579,7 @@ const Profilepage = () => {
                   display: "flex",
                   justifyContent: "flex-end",
                   marginTop: "16px",
-                }}
-              >
+                }}>
                 {isNameEditing ||
                 isPhoneNumberEditing ||
                 isAddressEditing ||
@@ -604,16 +589,14 @@ const Profilepage = () => {
                       variant="outlined"
                       color="error"
                       onClick={handleCancel}
-                      sx={{ mr: 2 }}
-                    >
+                      sx={{ mr: 2 }}>
                       <Typography variant="p2">Cancel</Typography>
                     </Button>
                     <Button
                       type="submit"
                       variant="outlined"
                       color="primary"
-                      onClick={handleSave}
-                    >
+                      onClick={handleSave}>
                       <Typography variant="p2">Save Profile</Typography>
                     </Button>
                   </Grid>
@@ -626,19 +609,17 @@ const Profilepage = () => {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
-        onClose={handleSnackbarClose}
-      >
+        onClose={handleSnackbarClose}>
         <MuiAlert
           elevation={6}
           variant="filled"
           onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-        >
+          severity={snackbarSeverity}>
           {snackbarMessage}
         </MuiAlert>
       </Snackbar>
-    </div>
+    </>
   );
 };
 
-export default Profilepage;
+export default ProfileContainer;

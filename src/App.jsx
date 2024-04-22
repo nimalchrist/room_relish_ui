@@ -8,7 +8,7 @@ import HotelDetails from "./pages/HotelDetails";
 import InteriorImages from "./pages/InteriorImages";
 import HotelList from "./pages/HotelList";
 import BookingDetailsPage from "./pages/BookingDetailsPage";
-import Profile from "./pages/Profile";
+import ProfilePage from "./pages/ProfilePage";
 import ViewBookedRoomDetailsPage from "./pages/ViewBookedRoomDetailsPage";
 import NoPage from "./pages/NoPage";
 import Favourites from "./pages/Favourites";
@@ -34,7 +34,7 @@ const App = () => {
               <Route
                 path="view-booking"
                 element={<ViewBookedRoomDetailsPage />}></Route>
-              <Route path="profile" element={<Profile />}></Route>
+              <Route path="profile" element={<ProfilePage />}></Route>
               <Route path="favourites" element={<Favourites />}></Route>
               <Route path="*" element={<NoPage />} />
             </Route>

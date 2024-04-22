@@ -2,7 +2,7 @@ import { Box, Typography, Container } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Terms() {
+function TermsAndConditions() {
   return (
     <>
       <Container variant="outlined" style={{ maxWidth: 1232, marginTop: 64 }}>
@@ -99,4 +99,4 @@ function Terms() {
   );
 }
 
-export default Terms;
+export default TermsAndConditions;

@@ -4,21 +4,20 @@ import { Box, Container, Stack, Typography } from "@mui/material";
 
 const Hero = () => {
   return (
-    <Box sx={{ height: "90vh" }}>
-      <Box
-        sx={{
+    <Box sx={{ position: "relative", overflow: "hidden" }}>
+      <img
+        src={bg}
+        alt="background"
+        style={{
           position: "absolute",
           zIndex: -10,
           top: 0,
           left: 0,
-          right: 0,
-          bottom: 90,
-        }}>
-        <img
-          src={bg}
-          style={{ width: "100%", height: "94.8vh", objectFit: "cover" }}
-        />
-      </Box>
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
       <Box
         sx={{
           position: "absolute",
@@ -26,7 +25,7 @@ const Hero = () => {
           top: 0,
           left: 0,
           right: 0,
-          height: "95vh",
+          bottom: 0,
           backgroundImage:
             "linear-gradient(90deg, rgba(61,104,243, 0.83) 0%, rgba(236,239,255,0.00) 100%)",
           backgroundPosition: "lightgray 0px -211.032px",
@@ -35,15 +34,16 @@ const Hero = () => {
         }}
       />
 
-      <Container
-        maxWidth="lg"
-        sx={{ height: "inherit", display: "flex", alignItems: "center" }}>
+      <Container maxWidth="lg">
         <Stack
           sx={{
-            height: "inherit",
+            position: "relative",
+            height: "100vh",
             justifyContent: "center",
-            marginTop: "-5%",
-          }}>
+          }}
+          spacing={2}
+          alignItems="left"
+          textAlign="left">
           <Typography variant="hero" color="white">
             Make your travel
           </Typography>

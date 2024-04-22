@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 const UserDropdown = ({ anchorEl, onClose, onLogout }) => {
   const navigate = useNavigate();
-  const handleNavigation = () => {
+  const handleMyBookingsButtonNavigation = () => {
+    navigate("/");
+  };
+  const handleMyAccountButtonNavigation = () => {
     navigate("/profile");
   };
   return (
@@ -21,9 +24,14 @@ const UserDropdown = ({ anchorEl, onClose, onLogout }) => {
         vertical: "top",
         horizontal: "right",
       }}>
-      <MenuItem onClick={handleNavigation} sx={{ py: 2 }}>
+      <MenuItem onClick={handleMyAccountButtonNavigation} sx={{ py: 2 }}>
         <Typography variant="body" sx={{ color: "black" }}>
           My Account
+        </Typography>
+      </MenuItem>
+      <MenuItem onClick={handleMyBookingsButtonNavigation} sx={{ py: 2 }}>
+        <Typography variant="body" sx={{ color: "black" }}>
+          My Bookings
         </Typography>
       </MenuItem>
       <MenuItem onClick={onLogout} sx={{ py: 2 }}>

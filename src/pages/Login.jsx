@@ -13,13 +13,11 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
-import theme from "../utils/theme/theme";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -97,99 +95,77 @@ const Login = () => {
   };
 
   return (
-    <>
-      <Grid container component="main" sx={{ height: "auto" }}>
-        <CssBaseline />
-        <Grid
-          item
-          xs={6}
-          component={Paper}
-          elevation={1}
-          square
-          sx={{
-            margin: "10px auto",
-          }}>
-          <Box
-            sx={{
-              m: 2,
-              display: "flex",
-              flexDirection: "column",
-              padding: "60px",
-            }}>
-            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-              LOGIN
-            </Typography>
-            <Typography sx={{ mb: 2 }}>
-              Login to access your RoomRelish Account
-            </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 3 }}>
-              <Grid container spacing={1}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    autoComplete="new-password"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handlePasswordVisibility}>
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox value="allowExtraEmails" color="primary" />
-                    }
-                    label="Remember me"
-                  />
-                </Grid>
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ minHeight: "100vh" }}>
+      <CssBaseline />
+      <Grid item xs={12} sm={8} md={6} lg={4}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h5" component="h1" align="center" gutterBottom>
+            LOGIN
+          </Typography>
+          <Typography variant="body1" align="center" gutterBottom>
+            Login to access your RoomRelish Account
+          </Typography>
+          <form onSubmit={handleSubmit} noValidate>
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              margin="normal"
+              variant="outlined"
+            />
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="new-password"
+              margin="normal"
+              variant="outlined"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handlePasswordVisibility}>
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <FormControlLabel
+              control={<Checkbox value="allowExtraEmails" color="primary" />}
+              label="Remember me"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              sx={{ mt: 2 }}>
+              {loading ? <CircularProgress size={26} /> : "Login"}
+            </Button>
+            <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
+              <Grid item>
+                <Link to="/signup" variant="body2">
+                  Don't have an account? Sign Up
+                </Link>
               </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={loading}>
-                {loading ? <CircularProgress size={26} /> : "Login"}
-              </Button>
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  Don't have an account?{" "}
-                  <Link to="/signup" variant="body2">
-                    Signup
-                  </Link>
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </Grid>
+            </Grid>
+          </form>
+        </Paper>
       </Grid>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}>
         <MuiAlert
           elevation={6}
@@ -199,7 +175,7 @@ const Login = () => {
           {snackbarMessage}
         </MuiAlert>
       </Snackbar>
-    </>
+    </Grid>
   );
 };
 

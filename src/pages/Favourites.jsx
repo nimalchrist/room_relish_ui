@@ -14,42 +14,51 @@ import theme from "../utils/theme/theme";
 
 const Favourites = () => {
   const navigate = useNavigate();
-
   const [favourites, setFavourites] = useState([]);
 
-  useEffect(() => {
-    const askLoggedInStatus = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:3200/auth/users/user/islogined",
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          }
-        );
+  // suppportive methods
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-        if (response.ok) {
-          const responseData = await response.json();
+  const currentDate = new Date();
 
-          if (!responseData.success) {
-            // setLoggedIn(true);
-            navigate("/404-errror-no-login-status");
-          }
+  const checkInDate = new Date(currentDate);
+  checkInDate.setDate(currentDate.getDate() + 1);
+
+  const checkOutDate = new Date(checkInDate);
+  checkOutDate.setDate(checkInDate.getDate() + 2);
+
+  const formattedCheckIn = formatDate(checkInDate);
+  const formattedCheckOut = formatDate(checkOutDate);
+
+  // supportive methods
+  const checkLoginStatus = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3200/auth/users/user/islogined",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
         }
-      } catch (error) {
-        console.error("An error occurred:", error.message);
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+
+        if (!responseData.success) {
+          navigate("/404-errror-no-login-status");
+        }
       }
-    };
-
-    askLoggedInStatus();
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+    }
+  };
+  const fetchFavouritesHotel = async () => {
     try {
       const response = await axios.get(
         "http://localhost:3200/auth/users/favourites",
@@ -63,7 +72,21 @@ const Favourites = () => {
       console.error("Error fetching data:", error.message);
     }
   };
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < rating; i++) {
+      stars.push(
+        <StarOutlinedIcon
+          key={i}
+          fontSize="small"
+          style={{ color: "#FF8682" }}
+        />
+      );
+    }
+    return stars;
+  };
 
+  // handlers
   const handleFavoriteClick = (hotelId) => {
     const isCurrentlyFavorite = favourites.some((fav) => fav._id === hotelId);
     const method = isCurrentlyFavorite ? "DELETE" : "POST";
@@ -86,24 +109,22 @@ const Favourites = () => {
         console.error("Error making request:", error);
       });
   };
-  const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 0; i < rating; i++) {
-      stars.push(
-        <StarOutlinedIcon
-          key={i}
-          fontSize="small"
-          style={{ color: "#FF8682" }}
-        />
-      );
-    }
-    return stars;
-  };
-
-  const handleFavourite = (id) => {
-    const queryString = `?q=${encodeURIComponent(id)}`;
+  const handleFavouriteHotelViewClick = (id) => {
+    const queryString = `?q=${encodeURIComponent(
+      id
+    )}&checkIn=${encodeURIComponent(
+      formattedCheckIn
+    )}&checkOut=${encodeURIComponent(formattedCheckOut)}&rooms=1`;
     navigate(`/hotel-details${queryString}`);
   };
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  useEffect(() => {
+    fetchFavouritesHotel();
+  }, []);
 
   return (
     <div>
@@ -111,13 +132,13 @@ const Favourites = () => {
         <Box
           sx={{
             width: "80%",
-            height: "auto",
+            height: "100vh",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             color: "#504E4D",
+            margin: "30px auto",
           }}>
-          {/* <div> */}
           <div style={{ display: "flex", flexDirection: "column", rowGap: 15 }}>
             <h1 style={{ color: "#504E4D", marginBottom: "1rem" }}>Hmmm... </h1>
             <p
@@ -140,7 +161,6 @@ const Favourites = () => {
           <div>
             <img src={favouriteImage} alt="favourite" />
           </div>
-          {/* </div> */}
         </Box>
       ) : (
         <Box
@@ -301,8 +321,7 @@ const Favourites = () => {
                     <Grid item>
                       <Button
                         sx={{ color: "red" }}
-                        onClick={() => handleFavoriteClick(feature._id)} 
-                      >
+                        onClick={() => handleFavoriteClick(feature._id)}>
                         {favourites.some((fav) => fav._id === feature._id) ? (
                           <FavoriteOutlinedIcon />
                         ) : (
@@ -313,12 +332,14 @@ const Favourites = () => {
 
                     <Button
                       variant="outlined"
-                      onClick={() => handleFavourite(feature._id)}
+                      onClick={() => handleFavouriteHotelViewClick(feature._id)}
                       sx={{
                         width: "50vw",
                         height: "38px",
                         backgroundColor: theme.palette.primary.main,
-                        "&:hover": { backgroundColor: theme.palette.primary.main },
+                        "&:hover": {
+                          backgroundColor: theme.palette.primary.main,
+                        },
                       }}>
                       <Typography
                         variant="rating"
