@@ -126,6 +126,7 @@ const BookedDetailsCard = () => {
           flexBasis="100%"
           display="flex"
           alignItems="center"
+          justifyContent="space-between"
           style={{
             padding: "1rem",
             backgroundColor: theme.palette.primary.main,
@@ -146,7 +147,6 @@ const BookedDetailsCard = () => {
             </Typography>
           </Grid>
         </Grid>
-
         <Grid
           container
           style={{

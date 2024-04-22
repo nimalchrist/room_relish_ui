@@ -123,7 +123,7 @@ const BookingDetails = () => {
         const responseData = await response.json();
 
         if (!responseData.success) {
-          navigate("/*");
+          navigate("/not_authorised_to_view_this_page");
         }
       }
     } catch (error) {
