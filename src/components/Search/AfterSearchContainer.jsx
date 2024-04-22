@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Paper,
   TextField,
@@ -6,12 +6,12 @@ import {
   Grid,
   FormControl,
   Button,
+  CircularProgress,
   IconButton,
 } from "@mui/material";
 import theme from "../../utils/theme/theme";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
 
 import search from "../../assets/icons/search-icons/search.svg";
 import car from "../../assets/icons/search-icons/car.svg";
@@ -57,14 +57,13 @@ const AfterSearchContainer = ({
   setCheckOut,
   setRooms,
 }) => {
+  // hooks
+  const [loading, setLoading] = useState(false);
   // handlers
   const handleClick = () => {
-    const queryString = `?q=${encodeURIComponent(
-      destination
-    )}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(
-      checkOut
-    )}&rooms=${encodeURIComponent(rooms)}`;
+    setLoading(true);
     handleSearch();
+    setLoading(false);
   };
 
   return (
@@ -138,7 +137,13 @@ const AfterSearchContainer = ({
                       <AddCircleIcon onClick={(e) => setRooms(rooms + 1)} />
                     </IconButton>
                     <IconButton>
-                      <RemoveCircle onClick={(e) => setRooms(rooms - 1)} />
+                      <RemoveCircle
+                        onClick={(e) => {
+                          if (rooms > 0) {
+                            setRooms(rooms - 1);
+                          }
+                        }}
+                      />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -147,7 +152,19 @@ const AfterSearchContainer = ({
           <Grid item>
             <StyledButton>
               <IconButton onClick={handleClick}>
-                <img src={search}></img>
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      verticalAlign: "middle",
+                      ml: 1,
+                      color: "white",
+                      width: "1.5rem",
+                    }}
+                  />
+                ) : (
+                  <img src={search}></img>
+                )}
               </IconButton>
             </StyledButton>
           </Grid>

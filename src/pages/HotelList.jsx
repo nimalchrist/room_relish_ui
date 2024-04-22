@@ -3,6 +3,8 @@ import AfterSearchContainer from "../components/Search/AfterSearchContainer.jsx"
 import FilterSection from "../components/HotelList/FilterSection.jsx";
 import HotelsViewport from "../components/HotelList/HotelsViewport.jsx";
 import DataNotFound from "../components/HotelList/Components/NoResult.jsx";
+import { CircularProgress } from "@mui/material";
+import theme from "../utils/theme/theme.jsx";
 
 const HotelList = () => {
   // query parameters
@@ -17,6 +19,8 @@ const HotelList = () => {
   const [In, setIn] = useState(checkInDate);
   const [Out, setOut] = useState(checkOutDate);
   const [rooms, setRooms] = useState(numberOfRooms);
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState([]);
 
   // filter state variables
   const [selectedPrice, setSelectedPrice] = useState([599, 20000]);
@@ -35,9 +39,6 @@ const HotelList = () => {
     { id: 9, label: "Non-smoking rooms ", checked: false },
     { id: 10, label: "Facilities for disabled guests", checked: false },
   ]);
-
-  // search results array
-  const [searchResults, setSearchResults] = useState([]);
 
   // handlers
   const handleSelectedPrice = (e, newValue) => {
@@ -66,6 +67,7 @@ const HotelList = () => {
 
   const handleSearch = async () => {
     try {
+      setLoading(true);
       const selectedAmenitiesIds = [...amenities, ...extraAmenities]
         .filter((amenity) => amenity.checked)
         .map((amenity) => amenity.label);
@@ -83,7 +85,9 @@ const HotelList = () => {
       const response = await fetch(url);
       const data = await response.json();
       setSearchResults(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error("Error occurred during fetch:", error);
     }
   };
@@ -122,7 +126,28 @@ const HotelList = () => {
         handleAmenitiesChange={handleAmenitiesChange}
         handleExtraAmenitiesChange={handleExtraAmenitiesChange}
       />
-      {!Array.isArray(searchResults) ? (
+      {loading ? (
+        <div
+          style={{
+            margin: "0px auto",
+            width: "50%",
+            "@media (max-width: 600px)": {
+              width: "100%",
+            },
+            height: "50vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+          <CircularProgress
+            style={{
+              color: theme.palette.primary.main,
+              width: "60px",
+              height: "60px",
+            }}
+          />
+        </div>
+      ) : !Array.isArray(searchResults) ? (
         <DataNotFound />
       ) : (
         <HotelsViewport

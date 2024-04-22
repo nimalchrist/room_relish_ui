@@ -56,6 +56,7 @@ const StyledButton = styled(Button)({
 });
 
 const SearchContainer = () => {
+  const todayDate = new Date().toISOString().split("T")[0];
   // hooks
   const navigate = useNavigate();
   const [destination, setDestination] = useState("");
@@ -155,6 +156,7 @@ const SearchContainer = () => {
               variant="outlined"
               id="checkin"
               InputLabelProps={{ shrink: true }}
+              inputProps={{ min: todayDate }}
               value={checkInDate}
               onChange={handleCheckIn}></StyledTextField>
           </Grid>
@@ -167,7 +169,8 @@ const SearchContainer = () => {
               variant="outlined"
               value={checkOutDate}
               onChange={handleCheckOut}
-              InputLabelProps={{ shrink: true }}></StyledTextField>
+              InputLabelProps={{ shrink: true }}
+              inputProps={{ min: todayDate }}></StyledTextField>
           </Grid>
 
           <Grid item>
