@@ -13,24 +13,22 @@ function FullReview() {
   const [loading, setLoading] = useState(false);
 
   // supportive methods
-  const calculateAverageRating = useCallback(() => {
+  function calculateAverageRating() {
     if (reviews.length === 0) return 0;
     const totalRating = reviews.reduce(
       (sum, review) => sum + parseFloat(review.guestRating),
       0
     );
     return (totalRating / reviews.length).toFixed(1);
-  }, [reviews]);
-
-  const getRatingMessage = useCallback((rating) => {
+  }
+  function getRatingMessage(rating) {
     if (rating >= 1 && rating < 2) return "Very Bad";
     if (rating >= 2 && rating < 3) return "Bad";
     if (rating >= 3 && rating < 4) return "Satisfactory";
     if (rating >= 4 && rating < 5) return "Very Good";
     if (rating === 5) return "Amazing";
     return "N/A";
-  }, []);
-
+  }
   const fetchReviewsData = async () => {
     try {
       const response = await fetch(
@@ -42,7 +40,9 @@ function FullReview() {
         return;
       }
       const data = await response.json();
-      setReviews(data);
+      if (JSON.stringify(data) !== JSON.stringify(reviews)) {
+        setReviews(data);
+      }
     } catch (error) {
       setErrorMessage(error);
       setSnackbarOpen(true);
@@ -66,6 +66,7 @@ function FullReview() {
         }
       );
       const addedReview = await response.json();
+      console.log(addedReview);
       if (!response.ok) {
         handleReviewSubmitError(addedReview.message);
         return;
@@ -90,12 +91,13 @@ function FullReview() {
   // useEffectHooks
   useEffect(() => {
     fetchReviewsData();
-  }, []);
+  }, [reviews]);
+
   useEffect(() => {
     setAverageRating(calculateAverageRating());
     const updatedRatingMessage = getRatingMessage(calculateAverageRating());
     setRatingMessage(updatedRatingMessage);
-  }, [reviews, calculateAverageRating, getRatingMessage]);
+  }, [reviews]);
   return (
     <>
       <Container
@@ -145,7 +147,7 @@ function FullReview() {
         />
         <ListOfReviewsContainer
           reviews={reviews}
-          onReviewSubmit={handleReviewSubmit}
+          handleReviewSubmit={handleReviewSubmit}
           loading={loading}
         />
       </Container>
