@@ -7,6 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 const ViewBookedRoomDetailsPage = () => {
   const navigate = useNavigate();
+
+  const handleBackButton = () => {
+    navigate("/");
+  };
   // supportive method
   const checkLoginStatus = async () => {
     try {
@@ -29,9 +33,18 @@ const ViewBookedRoomDetailsPage = () => {
       console.error("An error occurred:", error.message);
     }
   };
+
   useEffect(() => {
+    console.log("I am called");
     checkLoginStatus();
+
+    window.addEventListener("popstate", handleBackButton);
+    return () => {
+      console.log("I am called d");
+      window.removeEventListener("popstate", handleBackButton);
+    };
   }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);

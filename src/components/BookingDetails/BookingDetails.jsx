@@ -9,6 +9,9 @@ import {
   FormControl,
   FormControlLabel,
   Paper,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -37,8 +40,16 @@ const BookingDetails = () => {
   const [showViewBookingButton, setShowViewBookingButton] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-  const qparams = new URLSearchParams(window.location.search);
+  const [bookingSuccessfull, setBookingSuccessfull] = useState(null);
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [snackBarSeverity, setSnackBarSeverity] = useState("");
+  const [showPriceList, setShowPriceList] = useState(false);
+  const [bookingId, setBookingId] = useState("");
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  const qparams = new URLSearchParams(window.location.search);
   // parameter values
   const checkIn = qparams.get("checkin");
   const checkOut = qparams.get("checkout");
@@ -57,20 +68,14 @@ const BookingDetails = () => {
   }
 
   const totalAmount = numberOfDays * ratePerNight;
-  const items = [
-    {
-      name: `Base Fare [Days: ${numberOfDays}]`,
-      price: ratePerNight * numberOfDays,
-    },
-    { name: "Discount", price: 0 },
-    { name: "Taxes", price: 0 },
-    { name: "Service Fee", price: 5 },
-  ];
 
-  const totalAmountToBePaid = items.reduce(
-    (total, item) => total + parseFloat(item.price),
-    0
-  );
+  let totalAmountToBePaid = 0;
+  if (items.length > 0) {
+    totalAmountToBePaid += items.reduce(
+      (total, item) => total + parseFloat(item.price),
+      0
+    );
+  }
 
   // supportive methods
   const formatDate = (dateString) => {
@@ -135,64 +140,126 @@ const BookingDetails = () => {
   useEffect(() => {
     checkLoginStatus();
   }, []);
-
   useEffect(() => {
     fetchHotelSpecificData();
   }, []);
-
   useEffect(() => {
     fetchUserCardDetails();
   }, []);
+  useEffect(() => {
+    if (bookingSuccessfull) {
+      setShowPriceList(true);
+      setShowRadioButtons(true);
+    } else if (bookingSuccessfull !== null) {
+      setShowPriceList(false);
+      setShowRadioButtons(false);
+      setSnackBarOpen(true);
+      setSnackBarSeverity("error");
+      setSnackBarMessage(
+        "Something wrong with your booking....Try again later"
+      );
+    }
+    setBookingSuccessfull(null);
+  }, [bookingSuccessfull]);
 
   // handlers
-  const handleContinueYourBookingButtonClick = () => {
-    // need to call the booking api
-    if (true) {
-      setShowRadioButtons(true);
-    } else {
-      // booking faild message
+  const handleContinueYourBookingButtonClick = async () => {
+    try {
+      setLoading(true);
+      const accessToken =
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTM5NTMxNjAsImV4cCI6MTcxNDAzOTU2MH0.l8duDtp1LG-SSxefocU81Vddc7IDyhzAok9zB8wl_xQ";
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      };
+      // {
+      //   "email": "madhumitha@abc.com",
+      //   "password": "madhu123"
+      // }
+      const requestBody = {
+        _customerId: localStorage.getItem("clientId"),
+        _hotelId: hotelId,
+        _roomId: roomId,
+        customerRoomCount: parseInt(rooms),
+        customerDayCount: numberOfDays,
+      };
+
+      const response = await fetch(
+        "http://localhost:8081/api/v1/booking/bookingDetails",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(requestBody),
+        }
+      );
+      const responseBody = await response.json();
+      if (typeof responseBody === "object") {
+        setBookingId(responseBody.id);
+        const newItems = [
+          {
+            name: `Base Fare [${responseBody.numOfDays} Days]`,
+            price: responseBody.totalAmount,
+          },
+          { name: "Discount", price: 0 },
+          { name: "GST", price: responseBody.gstOfTotalAmount },
+          { name: "Service Fee", price: 5 },
+        ];
+        setBookingSuccessfull(true);
+        setItems(newItems);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        setBookingSuccessfull(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setBookingSuccessfull(false);
     }
-  };
-  const handleSelectedCardChange = (event) => {
-    setSelectedCard(event.target.value);
-    setIsRadioButtonClicked(true);
-  };
-  const handleOpenPopup = () => {
-    setShowPopup(true);
-  };
-  const handleClosePopup = () => {
-    setShowPopup(false);
   };
   const handlePayNowButtonClick = async () => {
     try {
-      const response = await fetch(`http://localhost:3200/payment/${hotelId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          hotelId: hotelId,
-        }),
-      });
-      const data = await response.json();
-      console.log(data);
+      setLoading(true);
+      const accessToken =
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTM5NTMxNjAsImV4cCI6MTcxNDAzOTU2MH0.l8duDtp1LG-SSxefocU81Vddc7IDyhzAok9zB8wl_xQ";
+      if (bookingId != "") {
+        console.log(bookingId);
+        const response = await fetch(
+          `http://localhost:8081/api/v1/payment/pay/${bookingId}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const responseBody = await response.json();
+        if (typeof responseBody == "object") {
+          setLoading(false);
+          setShowViewBookingButton(false);
+          setShowPaymentPopup(true);
+          setShowConfetti(true);
+          setTimeout(() => {
+            setShowPaymentPopup(false);
+            setShowConfetti(false);
+            setTimeout(() => {
+              setShowViewBookingButton(true);
+            }, 300);
+          }, 6000);
+        } else {
+          setLoading(false);
+          setSnackBarOpen(true);
+          setSnackBarSeverity("error");
+          setSnackBarMessage("Booking not found...Try again later");
+        }
+      }
     } catch (error) {
+      setLoading(false);
+      setSnackBarOpen(true);
+      setSnackBarSeverity("error");
+      setSnackBarMessage("Payment unsuccessfull...Try again later");
       console.error("Error in payment:", error);
-    }
-    if (true) {
-      setShowViewBookingButton(false);
-      setShowPaymentPopup(true);
-      setShowConfetti(true);
-      setTimeout(() => {
-        setShowPaymentPopup(false);
-        setShowConfetti(false);
-        setTimeout(() => {
-          setShowViewBookingButton(true);
-        }, 500);
-      }, 4000);
-    } else {
-      //need to add some other logic
     }
   };
   const handleViewBookingButtonClick = () => {
@@ -207,6 +274,19 @@ const BookingDetails = () => {
     )}`;
     navigate(`/view-booking${query}`);
   };
+  const handleSelectedCardChange = (event) => {
+    setSelectedCard(event.target.value);
+    setIsRadioButtonClicked(true);
+  };
+  const handleOpenPopup = () => {
+    setShowPopup(true);
+  };
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+  const handleSnackbarClose = async () => {
+    setSnackBarOpen(false);
+  };
 
   return (
     <Box
@@ -218,7 +298,7 @@ const BookingDetails = () => {
         justifyContent: "space-between",
         flexWrap: "wrap",
       }}>
-      <Box sx={{ flexBasis: "48%" }}>
+      <Box sx={{ flexBasis: showPriceList ? "48%" : "100%" }}>
         <Box
           textAlign="center"
           sx={{
@@ -231,7 +311,7 @@ const BookingDetails = () => {
             <strong>{room}</strong>
           </Typography>
           <Typography variant="b" sx={{ color: "#FF8682" }}>
-            ₹{ratePerNight}/night
+            ₹{ratePerNight}/day
           </Typography>
         </Box>
         <Box
@@ -259,102 +339,107 @@ const BookingDetails = () => {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ flexBasis: "48%" }}>
-        <Paper
-          elevation={3}
-          sx={{
-            width: "100%",
-            alignItems: "center",
-            borderRadius: "10px",
-            padding: "10px",
-          }}>
-          <Box
-            display="flex"
-            flexWrap="wrap"
-            alignItems="center"
-            justifyContent="space-between">
+      {showPriceList && (
+        <Box sx={{ flexBasis: "48%" }}>
+          <Paper
+            elevation={3}
+            sx={{
+              width: "100%",
+              alignItems: "center",
+              borderRadius: "10px",
+              padding: "10px",
+            }}>
             <Box
-              sx={{
-                flexBasis: "25%",
-                height: "auto",
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                overflow: "hidden",
-              }}>
-              <img
-                src={hotelImage}
-                alt="Hotel Image"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
-              />
+              display="flex"
+              flexWrap="wrap"
+              alignItems="center"
+              justifyContent="space-between">
+              <Box
+                sx={{
+                  flexBasis: "25%",
+                  height: "auto",
+                  border: "1px solid #ccc",
+                  borderRadius: 4,
+                  overflow: "hidden",
+                }}>
+                <img
+                  src={hotelImage}
+                  alt="Hotel Image"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+              <Box style={{ flexBasis: "70%" }}>
+                <Typography variant="z">
+                  <strong>{room}</strong>
+                </Typography>
+              </Box>
             </Box>
-            <Box style={{ flexBasis: "70%" }}>
-              <Typography variant="z">
-                <strong>{room}</strong>
-              </Typography>
-            </Box>
-          </Box>
-          <div
-            style={{
-              width: "100%",
-              height: "1px",
-              background: "grey",
-              marginTop: "18px",
-            }}
-          />
-          <Typography variant="y">
-            Your booking is protected by<strong> Room Relish</strong>
-          </Typography>
-          <div
-            style={{
-              width: "100%",
-              height: "1px",
-              background: "grey",
-              marginTop: "3px",
-              marginBottom: "10px",
-            }}
-          />
-          <Typography variant="x">
-            <strong>Price Details</strong>
-          </Typography>
-          {items.map((item, index) => (
-            <Grid container key={index}>
+            <div
+              style={{
+                width: "100%",
+                height: "1px",
+                background: "grey",
+                marginTop: "18px",
+              }}
+            />
+            <Typography variant="y">
+              Your booking is protected by<strong> Room Relish</strong>
+            </Typography>
+            <div
+              style={{
+                width: "100%",
+                height: "1px",
+                background: "grey",
+                marginTop: "3px",
+                marginBottom: "10px",
+              }}
+            />
+            <Typography variant="x">
+              <strong>Price Details</strong>
+            </Typography>
+            {items.length > 0 ? (
+              items.map((item, index) => (
+                <Grid container key={index}>
+                  <Grid item xs={6}>
+                    <Typography variant="w">{item.name}</Typography>
+                  </Grid>
+                  <Grid item xs={6} textAlign="right">
+                    <Typography variant="v">
+                      <strong>{`₹${item.price}`}</strong>
+                    </Typography>
+                  </Grid>
+                </Grid>
+              ))
+            ) : (
+              <Typography>Loading...</Typography>
+            )}
+            <div
+              style={{
+                width: "100%",
+                height: "1px",
+                background: "grey",
+                marginRight: "10px",
+                marginBottom: "9px",
+                marginTop: "10px",
+              }}
+            />
+            <Grid container>
               <Grid item xs={6}>
-                <Typography variant="w">{item.name}</Typography>
+                <Typography variant="w">Total</Typography>
               </Grid>
               <Grid item xs={6} textAlign="right">
                 <Typography variant="v">
-                  <strong>{`₹${item.price}`}</strong>
+                  <strong>{`₹${totalAmountToBePaid.toFixed(2)}`}</strong>
                 </Typography>
               </Grid>
             </Grid>
-          ))}
-          <div
-            style={{
-              width: "100%",
-              height: "1px",
-              background: "grey",
-              marginRight: "10px",
-              marginBottom: "9px",
-              marginTop: "10px",
-            }}
-          />
-          {/* Total Price */}
-          <Grid container>
-            <Grid item xs={6}>
-              <Typography variant="w">Total</Typography>
-            </Grid>
-            <Grid item xs={6} textAlign="right">
-              <Typography variant="v">
-                <strong>{`₹${totalAmountToBePaid.toFixed(2)}`}</strong>
-              </Typography>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Box>
+          </Paper>
+        </Box>
+      )}
       <Box sx={{ flexBasis: "100%" }}>
         <Box
           sx={{
@@ -368,8 +453,15 @@ const BookingDetails = () => {
                 variant="contained"
                 style={{ zIndex: 1 }}
                 fullWidth
+                disabled={loading}
                 onClick={handleContinueYourBookingButtonClick}>
-                Continue Your Booking
+                {loading ? (
+                  <>
+                    Continue your Booking <CircularProgress size={26} />
+                  </>
+                ) : (
+                  "Continue Your Booking"
+                )}
               </Button>
             </React.Fragment>
           ) : (
@@ -467,8 +559,15 @@ const BookingDetails = () => {
                 zIndex: 1,
                 width: "100%",
               }}
+              disabled={loading}
               onClick={handlePayNowButtonClick}>
-              Complete Your Payment
+              {loading ? (
+                <>
+                  Complete Your Payment <CircularProgress size={26} />
+                </>
+              ) : (
+                "Complete Your Payment"
+              )}
             </Button>
           )}
           {!showConfetti && showViewBookingButton && (
@@ -533,12 +632,26 @@ const BookingDetails = () => {
                 />
               </Box>
               <Typography variant="h4" sx={{ opacity: 1 }}>
-                <strong>Payment Successful !!!</strong>
+                <strong>
+                  Payment Successful...₹ {totalAmountToBePaid.toFixed(2)} paid
+                </strong>
               </Typography>
             </Box>
           )}
         </Box>
       </Box>
+      <Snackbar
+        open={snackBarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}>
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackBarSeverity}>
+          {snackBarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

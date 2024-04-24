@@ -33,7 +33,7 @@ function Footer() {
       style={{
         backgroundColor: "#3d68f3",
         padding: "20px 0px",
-        height: "370px",
+        height: "auto",
         width: "100%",
       }}>
       <Grid
