@@ -14,6 +14,7 @@ import NoPage from "./pages/NoPage";
 import FavouritesPage from "./pages/FavouritesPage";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./utils/theme/theme";
+import BookingsPage from "./pages/BookingsPage";
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
                 element={<ViewBookedRoomDetailsPage />}></Route>
               <Route path="profile" element={<ProfilePage />}></Route>
               <Route path="favourites" element={<FavouritesPage />}></Route>
+              <Route path="bookings" element={<BookingsPage />}></Route>
               <Route path="*" element={<NoPage />} />
             </Route>
           </Routes>

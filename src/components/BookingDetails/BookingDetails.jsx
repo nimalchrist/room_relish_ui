@@ -167,21 +167,19 @@ const BookingDetails = () => {
     try {
       setLoading(true);
       const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTM5NTMxNjAsImV4cCI6MTcxNDAzOTU2MH0.l8duDtp1LG-SSxefocU81Vddc7IDyhzAok9zB8wl_xQ";
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxMzEwNzIsImV4cCI6MTcxNDIxNzQ3Mn0.DoMst2eFvZs_Z_RKOMAbphAF39Attc3AHNEOv8JZHXQ";
       const headers = {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       };
-      // {
-      //   "email": "madhumitha@abc.com",
-      //   "password": "madhu123"
-      // }
       const requestBody = {
         _customerId: localStorage.getItem("clientId"),
         _hotelId: hotelId,
         _roomId: roomId,
         customerRoomCount: parseInt(rooms),
         customerDayCount: numberOfDays,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
       };
 
       const response = await fetch(
@@ -220,7 +218,7 @@ const BookingDetails = () => {
     try {
       setLoading(true);
       const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTM5NTMxNjAsImV4cCI6MTcxNDAzOTU2MH0.l8duDtp1LG-SSxefocU81Vddc7IDyhzAok9zB8wl_xQ";
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxMzEwNzIsImV4cCI6MTcxNDIxNzQ3Mn0.DoMst2eFvZs_Z_RKOMAbphAF39Attc3AHNEOv8JZHXQ";
       if (bookingId != "") {
         console.log(bookingId);
         const response = await fetch(

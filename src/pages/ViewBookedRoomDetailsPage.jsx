@@ -35,12 +35,9 @@ const ViewBookedRoomDetailsPage = () => {
   };
 
   useEffect(() => {
-    console.log("I am called");
     checkLoginStatus();
-
     window.addEventListener("popstate", handleBackButton);
     return () => {
-      console.log("I am called d");
       window.removeEventListener("popstate", handleBackButton);
     };
   }, []);

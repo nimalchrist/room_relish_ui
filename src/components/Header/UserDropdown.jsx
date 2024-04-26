@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const UserDropdown = ({ anchorEl, onClose, onLogout }) => {
   const navigate = useNavigate();
   const handleMyBookingsButtonNavigation = () => {
-    navigate("/");
+    navigate("/bookings");
   };
   const handleMyAccountButtonNavigation = () => {
     navigate("/profile");
