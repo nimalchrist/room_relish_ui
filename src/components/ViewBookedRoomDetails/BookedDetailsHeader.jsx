@@ -26,15 +26,6 @@ import {
 import axios from "axios";
 
 const BookedDetailsHeader = () => {
-  const commonIconButtonStyle = {
-    height: "32px",
-    color: theme.palette.primary.main,
-    padding: "5px",
-    border: "1px solid",
-    borderColor: theme.palette.primary.main,
-    borderRadius: "0",
-    marginRight: "12px",
-  };
   // hooks
   const [address, setAddress] = useState("");
   const [hotelName, setHotelName] = useState("");
@@ -60,8 +51,8 @@ const BookedDetailsHeader = () => {
 
     const opt = {
       margin: 10,
-      filename: `RoomRelish_Booking_Confirmation${roomId}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
+      filename: `RoomRelish_Booking_Confirmation_${roomId}.pdf`,
+      image: { type: "jpg", quality: 0.98 },
       jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
@@ -230,7 +221,15 @@ const BookedDetailsHeader = () => {
               }}>
               <Grid item>
                 <IconButton
-                  sx={commonIconButtonStyle}
+                  sx={{
+                    height: "32px",
+                    color: theme.palette.primary.main,
+                    padding: "5px",
+                    border: "1px solid",
+                    borderColor: theme.palette.primary.main,
+                    borderRadius: "0",
+                    marginRight: "12px",
+                  }}
                   onClick={handleShareClick}>
                   <ShareIcon />
                 </IconButton>

@@ -167,7 +167,7 @@ const BookingDetails = () => {
     try {
       setLoading(true);
       const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxMzEwNzIsImV4cCI6MTcxNDIxNzQ3Mn0.DoMst2eFvZs_Z_RKOMAbphAF39Attc3AHNEOv8JZHXQ";
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
       const headers = {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
@@ -218,11 +218,11 @@ const BookingDetails = () => {
     try {
       setLoading(true);
       const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxMzEwNzIsImV4cCI6MTcxNDIxNzQ3Mn0.DoMst2eFvZs_Z_RKOMAbphAF39Attc3AHNEOv8JZHXQ";
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
       if (bookingId != "") {
         console.log(bookingId);
         const response = await fetch(
-          `http://localhost:8081/api/v1/payment/pay/${bookingId}`,
+          `http://localhost:8081/api/v1/payment/pay?_bookingId=${bookingId}`,
           {
             method: "POST",
             headers: {

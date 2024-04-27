@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 function BookingCard({ booking, fetchBookingsOfUser }) {
   const navigate = useNavigate();
   const accessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxMzEwNzIsImV4cCI6MTcxNDIxNzQ3Mn0.DoMst2eFvZs_Z_RKOMAbphAF39Attc3AHNEOv8JZHXQ";
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
 
   // handlers
   const handleDeleteButtonClick = async (bookingId) => {
@@ -38,7 +38,7 @@ function BookingCard({ booking, fetchBookingsOfUser }) {
     try {
       if (booking.id != "") {
         const response = await fetch(
-          `http://localhost:8081/api/v1/payment/pay/${booking._bookingId}`,
+          `http://localhost:8081/api/v1/payment/pay?_bookingId=${booking._bookingId}`,
           {
             method: "POST",
             headers: {
@@ -63,7 +63,7 @@ function BookingCard({ booking, fetchBookingsOfUser }) {
     console.log("view booking called");
     const query = `?hid=${encodeURIComponent(
       booking._hotelId
-    )}&rid=${encodeURIComponent(booking._roomdId)}&rii=${encodeURIComponent(
+    )}&rid=${encodeURIComponent(booking._roomId)}&rii=${encodeURIComponent(
       1
     )}&rupees=${encodeURIComponent(
       booking.totalAmount

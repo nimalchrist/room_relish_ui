@@ -46,8 +46,8 @@ const ViewBookedRoomDetailsPage = () => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
   return (
-    <div id="pageContent">
-      <Box sx={{ width: "80%", margin: "100px auto" }}>
+    <div>
+      <Box id="pageContent" sx={{ width: "80%", margin: "100px auto" }}>
         <BookedDetailsHeader />
         <BookedDetailsCard />
         <TermsAndConditions />
