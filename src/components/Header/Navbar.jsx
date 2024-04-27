@@ -95,17 +95,12 @@ const Navbar = () => {
 
         if (responseData.success) {
           setLoggedIn(true);
-          console.log("User is logged in.");
           if (responseData.info) {
-            console.log("User data:", responseData.info);
             setProfilePicture(responseData.info.profilePicture);
             setUserName(responseData.info.userName);
-          } else {
-            console.log("No user data available.");
           }
         } else {
           setLoggedIn(false);
-          console.log("User is not logged in.");
         }
       } else {
         console.log("Request failed with status:", response.status);
