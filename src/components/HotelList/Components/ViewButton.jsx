@@ -1,11 +1,12 @@
-import React from "react";
-import { Button, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import theme from "../../../utils/theme/theme";
 
 function ViewButton({ hotelId, In, Out, rooms }) {
   // hooks
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // handlers
   const handleIconClick = async () => {
@@ -24,14 +25,18 @@ function ViewButton({ hotelId, In, Out, rooms }) {
     };
 
     try {
+      setLoading(true);
       const response = await fetch(url, fetchOptions);
       if (!response.ok) {
+        setLoading(false);
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
       console.log("PUT request succeeded with response:", data);
+      setLoading(false);
     } catch (error) {
       console.error("There was a problem with the PUT request:", error);
+      setLoading(false);
     }
     navigate(`/hotel-details${queryString}`);
   };
@@ -42,6 +47,7 @@ function ViewButton({ hotelId, In, Out, rooms }) {
       onClick={handleIconClick}
       variant="outlined"
       disabledRipple
+      disabled={loading}
       sx={{
         width: "100%",
         height: "38px",
@@ -59,7 +65,13 @@ function ViewButton({ hotelId, In, Out, rooms }) {
           fontWeight: 500,
           fontStyle: "normal",
         }}>
-        View Place
+        {loading ? (
+          <>
+            View Place <CircularProgress color={"secondary"} size={20} />
+          </>
+        ) : (
+          "View Place"
+        )}
       </Typography>
     </Button>
   );

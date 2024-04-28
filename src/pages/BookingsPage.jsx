@@ -4,6 +4,10 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 function BookingsPage() {
+  // accessToken
+  const accessToken =
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
+  // hooks
   const navigate = useNavigate();
   const [bookingList, setBookingList] = useState(null);
 
@@ -32,10 +36,9 @@ function BookingsPage() {
   const fetchBookingsOfUser = async () => {
     try {
       const userId = localStorage.getItem("clientId");
-      const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
+
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
+        // Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       };
       const apiUrl = `http://localhost:8081/api/v1/payment/myBookings?_userId=${userId}`;

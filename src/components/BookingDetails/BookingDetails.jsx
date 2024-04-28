@@ -24,6 +24,10 @@ import { useNavigate } from "react-router-dom";
 import theme from "../../utils/theme/theme";
 
 const BookingDetails = () => {
+  // Token
+  const accessToken =
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
+
   // hooks
   const navigate = useNavigate();
   const [cardList, setCardList] = useState([]);
@@ -166,10 +170,8 @@ const BookingDetails = () => {
   const handleContinueYourBookingButtonClick = async () => {
     try {
       setLoading(true);
-      const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
+        // Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       };
       const requestBody = {
@@ -217,8 +219,6 @@ const BookingDetails = () => {
   const handlePayNowButtonClick = async () => {
     try {
       setLoading(true);
-      const accessToken =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWRodW1pdGhhQGFiYy5jb20iLCJpYXQiOjE3MTQxOTc1OTUsImV4cCI6MTcxNDI4Mzk5NX0.jtWl83lss78k8aZ7j2qx7y4RlQ5j1W9OC73v4lSZHlg";
       if (bookingId != "") {
         console.log(bookingId);
         const response = await fetch(
@@ -226,7 +226,7 @@ const BookingDetails = () => {
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              // Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
           }
